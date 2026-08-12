@@ -1,4 +1,4 @@
-# SupportIQ — Enterprise Customer-Service Agent Demo
+# SupportIQ — Enterprise Customer-Service Agent 
 
 SupportIQ is a policy-controlled, omnichannel service agent. This pilot is configured for **ConnectLine**, a telecommunications company. It is deliberately built around enterprise boundaries: the AI plans a resolution, a policy engine authorizes it, and connector-shaped tools execute persistent actions.
 
