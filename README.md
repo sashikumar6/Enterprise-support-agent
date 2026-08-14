@@ -41,10 +41,16 @@ See [architecture and limitations](docs/ARCHITECTURE.md), the editable
 
 ## Local development
 
-Node.js 22 or newer is required. The fixture journey needs no Cloudflare account or provider
-secret:
+Node.js 22 or newer is required. Anyone can clone this public repository and run the exact same
+app locally — no relationship to this project, and no Cloudflare account or provider secret, is
+required for the fixture journey.
 
 ```sh
+git clone git@github.com:sashikumar6/Enterprise-support-agent.git
+# or, if you don't have an SSH key registered with GitHub:
+# git clone https://github.com/sashikumar6/Enterprise-support-agent.git
+cd Enterprise-support-agent
+
 npm ci
 npm run migrate:local
 npm run dev
@@ -52,6 +58,35 @@ npm run dev
 
 Open `http://127.0.0.1:8787`. Choose **Demo fixtures only** for a repeatable, quota-free search.
 Optional provider values belong in ignored `.dev.vars`/`.env.local` files; never commit them.
+
+### Troubleshooting a fresh clone
+
+- **`git@github.com: Permission denied (publickey)` on clone** — this is a public repository, so
+  SSH access has nothing to do with permissions on this project; GitHub still requires *some*
+  SSH key on file for `git@github.com` clones. Either add an SSH key to your own GitHub account
+  ([docs](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)), or use the
+  HTTPS clone URL above, which works anonymously with no key or account.
+- **`npm ci` fails on Node version** — check `node -v`; this project requires Node 22+ (`nvm install 22`
+  works if you use nvm).
+- **`wrangler dev` asks you to log in** — it shouldn't for the default `npm run dev` flow above,
+  which only touches the local, on-disk D1 database (`database_id = "local-development"` in
+  `wrangler.toml`) and needs no Cloudflare account. If you see a login prompt, you likely ran
+  `npm run dev:ai` (Workers AI) or a `deploy:*`/`migrate:preview`/`migrate:production` script —
+  those intentionally talk to a real Cloudflare account.
+- **Live Ticketmaster/Stripe data instead of fixtures** — copy `.dev.vars.example` to `.dev.vars`
+  and fill in your *own* `TICKETMASTER_API_KEY`, `STRIPE_SECRET_KEY` (test-mode), and
+  `STRIPE_WEBHOOK_SECRET`. These are per-developer secrets, intentionally excluded from git, and
+  ours won't work for you.
+- **Conversational search always falls back** ("Conversational search is unavailable right now")
+  — this is expected on plain `npm run dev`. Workers AI is only bound when you run
+  `npm run dev:ai`, which requires `wrangler login` against your own Cloudflare account (Workers AI
+  has no fully-offline local emulation).
+- **Deploying your own preview/production copy** — `wrangler.toml`'s `[env.preview]` and
+  `[env.production]` blocks hardcode D1 `database_id`s and rate-limit `namespace_id`s that belong
+  to this project's Cloudflare account; you cannot deploy against them from another account. To
+  host your own copy, run `wrangler login`, create your own resources
+  (`wrangler d1 create scout-preview`, etc.), and swap the resulting IDs into your own
+  `wrangler.toml` before running `npm run deploy:preview` / `deploy:production`.
 
 ## Verification
 
