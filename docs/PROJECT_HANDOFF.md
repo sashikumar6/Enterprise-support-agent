@@ -2018,6 +2018,26 @@ secret-free clone, migrations `0001`–`0007`, 105 tests/build checks, and 10/10
 Reason: every Phase 9 matrix row now has deployed or reproducible evidence, so the stable portfolio
 link and repository meet the documented release outcome.
 
+### 2026-08-14 — Verify a post-release professional UI refresh locally
+
+Decision: replace the dark portfolio-landing presentation with a light, task-first product hierarchy
+inspired by Navan's public visual patterns, then adapt selected AI-native primitives from Beautiful UI
+and interaction cues from beUI. Preserve Scout's own identity and all provider, geography, voice,
+confirmation, sandbox-commerce, privacy, and operations boundaries. The Beautiful UI pixel
+loading/shimmer treatment is used under its MIT license and recorded in `THIRD_PARTY_NOTICES.md`;
+no Navan or beUI source, branding, or imagery was copied. Reason: the released implementation was
+functionally production-shaped but its long dark landing-page composition still read as a student
+portfolio rather than a mature consumer product. The refreshed local build passed 105 unit tests,
+both production builds, 10/10 desktop/mobile browser journeys, and 1440 px/390 px visual review.
+Production deployment remains a separate explicit action; evidence is in
+`docs/UI_REFRESH_ACCEPTANCE.md`.
+
+Follow-up polish replaced text-heavy utility controls with licensed Lucide SVG icons, added an
+original generated NYC evening image, and consolidated repeated demo/sandbox language into the
+specific sample-data, plan, checkout, cancellation, and footer contexts where disclosure matters.
+The full repository check still passes. Owner visual approval and a post-polish desktop/mobile
+browser rerun remain pending before any production deployment.
+
 ## 29. Immediate next action for a new Codex session
 
 No required implementation phase remains. Phase 9 is closed and the accepted public URL is

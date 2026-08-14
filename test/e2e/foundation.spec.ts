@@ -9,8 +9,10 @@ test("searches fixtures and inspects a clearly labeled event", async ({
   await expect(
     page.getByRole("heading", { name: "Your night, handled." }),
   ).toBeVisible();
-  await expect(page.getByText("Scout is a feasibility demo.")).toBeVisible();
-  await expect(page.locator(".service-status")).toContainText("System online");
+  await expect(
+    page.getByText("Live discovery · Stripe test checkout"),
+  ).toBeVisible();
+  await expect(page.locator(".service-status")).toContainText("Live data");
 
   await page
     .getByLabel("What are you in the mood for?")
@@ -27,13 +29,13 @@ test("searches fixtures and inspects a clearly labeled event", async ({
     .selectOption("evening");
   await page.getByRole("button", { name: "Find events" }).click();
 
-  await expect(page.getByText("Demo fixture data")).toBeVisible();
+  await expect(page.getByText("Sample data")).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Friday Night Comedy — Demo Event" }),
   ).toBeVisible();
   await page.getByText("View details", { exact: true }).click();
   await expect(
-    page.getByText("Demo event only; this is not real inventory."),
+    page.getByText("Sample event—not live inventory."),
   ).toBeVisible();
 
   await page.getByRole("button", { name: "Save as draft" }).click();
@@ -161,7 +163,7 @@ test("keeps voice optional and exposes editable lifecycle controls", async ({
   await expect(
     page.getByRole("button", { name: "Play response" }),
   ).toBeVisible();
-  await expect(page.getByRole("button", { name: "Stop" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Stop audio" })).toBeDisabled();
   await expect(page.getByRole("button", { name: "Mute" })).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Disable voice" }),
@@ -195,7 +197,7 @@ test("keeps voice optional and exposes editable lifecycle controls", async ({
   await page.getByRole("button", { name: "Create help record" }).click();
   await expect(
     page.getByText(
-      "Help request recorded for inspection. This demo has no staffed human support team.",
+      "Help request saved. Scout does not currently offer staffed support.",
     ),
   ).toBeVisible();
   await expect(

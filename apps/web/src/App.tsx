@@ -18,6 +18,23 @@ import {
   useState,
   type FormEvent,
 } from "react";
+import {
+  ArrowRight,
+  ArrowUp,
+  AudioLines,
+  Bookmark,
+  Check,
+  ExternalLink,
+  Headphones,
+  Mic,
+  RefreshCw,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  Square,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 
 type ServiceState = "checking" | "online" | "unavailable";
 type SearchState = "idle" | "loading" | "success" | "error";
@@ -101,16 +118,16 @@ function formatPrice(event: RankedEvent) {
 
 function fallbackMessage(result: EventSearchResult) {
   if (result.fallbackReason === "missing_key") {
-    return "Live discovery is not configured, so Scout is showing clearly labeled demo events.";
+    return "Live discovery is unavailable. Scout is showing clearly labeled sample events.";
   }
   if (result.fallbackReason === "invalid_credentials") {
-    return "Ticketmaster rejected the configured key. Scout switched to clearly labeled demo events.";
+    return "Live discovery could not connect. Scout switched to clearly labeled sample events.";
   }
   if (result.fallbackReason === "rate_limited") {
-    return "Ticketmaster rate-limited this search. Scout switched to clearly labeled demo events.";
+    return "Live discovery is temporarily busy. Scout switched to clearly labeled sample events.";
   }
   if (result.fallbackReason === "unavailable") {
-    return "Ticketmaster could not complete this search. Scout switched to clearly labeled demo events.";
+    return "Live discovery could not complete this search. Scout switched to clearly labeled sample events.";
   }
   return null;
 }
@@ -178,10 +195,10 @@ export function App() {
   const [commerceNotice, setCommerceNotice] = useState<string | null>(() => {
     const state = new URLSearchParams(window.location.search).get("checkout");
     if (state === "return") {
-      return "Stripe returned to Scout. Waiting for the verified webhook before confirming the demo reservation.";
+      return "Payment returned to Scout. Verification is still in progress.";
     }
     if (state === "cancelled") {
-      return "Sandbox checkout was closed. No reservation or charge was confirmed.";
+      return "Test checkout was closed. Nothing was confirmed or charged.";
     }
     return null;
   });
@@ -430,7 +447,7 @@ export function App() {
         .then((current) => {
           if (current.some((plan) => plan.state === "confirmed")) {
             setCommerceNotice(
-              "Verified Stripe webhook received. Your demo reservation is confirmed.",
+              "Payment verification received. Your test reservation is confirmed.",
             );
             window.clearInterval(timer);
           } else if (attempts >= 15) {
@@ -624,7 +641,7 @@ export function App() {
       } & ErrorResponse;
       if (!response.ok || !payload.data?.redirectUrl) {
         throw new Error(
-          payload.error?.message || "Sandbox checkout could not be started.",
+          payload.error?.message || "Test checkout could not be started.",
         );
       }
       window.location.assign(payload.data.redirectUrl);
@@ -632,7 +649,7 @@ export function App() {
       setPlansError(
         caught instanceof Error
           ? caught.message
-          : "Sandbox checkout could not be started.",
+          : "Test checkout could not be started.",
       );
       setCommerceBusy(null);
     }
@@ -661,7 +678,7 @@ export function App() {
       await loadPlans();
       setReviewingPlan(null);
       setCommerceNotice(
-        "Sandbox cancellation requested. Scout will mark it cancelled only after the verified refund webhook arrives.",
+        "Test cancellation requested. Scout will update the plan after refund verification.",
       );
     } catch (caught) {
       setPlansError(
@@ -788,7 +805,7 @@ export function App() {
         );
       setHelpRequests((current) => [payload.data as HelpRequest, ...current]);
       setLifecycleNotice(
-        "Help request recorded for inspection. This demo has no staffed human support team.",
+        "Help request saved. Scout does not currently offer staffed support.",
       );
     } catch (caught) {
       setLifecycleNotice(
@@ -896,10 +913,17 @@ export function App() {
       <a className="skip-link" href="#main-content">
         Skip to main content
       </a>
+      <aside className="announcement" aria-label="Scout product update">
+        <span>New</span>
+        <p>Live New York discovery, shaped around your plans.</p>
+        <a href="#discover">
+          Explore Scout <span aria-hidden="true">→</span>
+        </a>
+      </aside>
       <header className="topbar">
         <a className="brand" href="#main-content" aria-label="Scout home">
           <span className="brand-mark" aria-hidden="true">
-            sc
+            <Sparkles size={17} strokeWidth={2.4} />
           </span>
           Scout
         </a>
@@ -907,17 +931,17 @@ export function App() {
           <a href="#discover">Discover</a>
           <a href="#results">Recommendations</a>
           <a href="#plans">My plans</a>
-          <a href="#operations">Operations</a>
         </nav>
         <div className="topbar-actions">
           <a className="plans-link" href="#plans">
+            <Bookmark size={15} aria-hidden="true" />
             Plans <span>{plans.length}</span>
           </a>
           <div className="service-status" role="status" aria-live="polite">
             <span className={`status-dot status-dot--${serviceState}`} />
-            {serviceState === "checking" && "Checking system"}
-            {serviceState === "online" && "System online"}
-            {serviceState === "unavailable" && "System unavailable"}
+            {serviceState === "checking" && "Connecting"}
+            {serviceState === "online" && "Live data"}
+            {serviceState === "unavailable" && "Service issue"}
           </div>
         </div>
       </header>
@@ -926,155 +950,234 @@ export function App() {
         <section className="hero" aria-labelledby="hero-title">
           <div className="hero-grid">
             <div className="hero-copy-block">
-              <p className="eyebrow">Your AI events concierge · New York</p>
+              <p className="eyebrow">AI events concierge · New York</p>
               <h1 id="hero-title">Your night, handled.</h1>
               <p className="hero-copy">
-                Say what sounds good. Scout turns it into live, explainable
-                event options while you stay in control of every decision.
+                Tell Scout what kind of night you want. Get live, explainable
+                options—and stay in control from discovery to a saved plan.
               </p>
+              <div className="hero-actions">
+                <a className="hero-primary" href="#event-request">
+                  Start with Scout <ArrowRight size={16} aria-hidden="true" />
+                </a>
+                <a className="hero-secondary" href="#discover">
+                  Search with filters
+                </a>
+              </div>
               <div className="hero-proof" aria-label="Scout product safeguards">
-                <span>Live provider facts</span>
-                <span>Transparent ranking</span>
-                <span>Test checkout only</span>
+                <span>
+                  <strong>Live</strong> provider facts
+                </span>
+                <span>
+                  <strong>Clear</strong> ranking reasons
+                </span>
+                <span>
+                  <strong>Safe</strong> test checkout
+                </span>
               </div>
             </div>
 
-            <div className="concierge-card">
-              <div className="concierge-heading">
-                <div className="assistant-avatar" aria-hidden="true">
-                  S
-                </div>
-                <div>
-                  <strong>Scout concierge</strong>
-                  <span>Powered by governed AI</span>
-                </div>
-                <span className="live-badge">Read only</span>
+            <div className="concierge-stage">
+              <div className="floating-signal floating-signal--provider">
+                <span className="signal-icon" aria-hidden="true">
+                  <Check size={15} strokeWidth={3} />
+                </span>
+                <span>
+                  <strong>Live inventory</strong>Ticketmaster connected
+                </span>
               </div>
-              <div className="assistant-reply" role="status" aria-live="polite">
-                <span aria-hidden="true">✦</span>
-                <p>{conversationReply}</p>
+              <div className="floating-signal floating-signal--control">
+                <span className="signal-icon" aria-hidden="true">
+                  <ShieldCheck size={15} strokeWidth={2.5} />
+                </span>
+                <span>
+                  <strong>You approve actions</strong>No autonomous purchase
+                </span>
               </div>
-              <div
-                className="speech-controls"
-                aria-label="Spoken response controls"
-              >
-                <button
-                  type="button"
-                  onClick={() => void speakReply()}
-                  disabled={!speechEnabled || speechMuted || speechBusy}
-                >
-                  {speechBusy
-                    ? "Preparing audio…"
-                    : spokenUrl.current
-                      ? "Replay response"
-                      : "Play response"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => spokenAudio.current?.pause()}
-                  disabled={!spokenAudio.current}
-                >
-                  Stop
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={speechMuted}
-                  onClick={() => setMuted(!speechMuted)}
-                >
-                  {speechMuted ? "Unmute" : "Mute"}
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={!speechEnabled}
-                  onClick={() => setSpokenEnabled(!speechEnabled)}
-                >
-                  {speechEnabled ? "Disable voice" : "Enable voice"}
-                </button>
-              </div>
-              {conversationMeta.length > 0 && (
-                <div className="conversation-meta">
-                  {conversationMeta.map((item) => (
-                    <span key={item}>{item}</span>
-                  ))}
+              <div className="concierge-card">
+                <div className="concierge-heading">
+                  <div className="assistant-avatar" aria-hidden="true">
+                    <Sparkles size={17} strokeWidth={2.4} />
+                  </div>
+                  <div>
+                    <strong>Scout concierge</strong>
+                    <span>Live event discovery</span>
+                  </div>
+                  <span className="live-badge">Search only</span>
                 </div>
-              )}
-              <form className="concierge-form" onSubmit={submitConversation}>
-                <label htmlFor="event-request">
-                  What are you in the mood for?
-                </label>
-                <textarea
-                  id="event-request"
-                  value={conversationMessage}
-                  onChange={(event) =>
-                    setConversationMessage(event.target.value)
-                  }
-                  maxLength={500}
-                  rows={3}
-                  placeholder="A funny date night next Friday, under $80 each…"
-                />
-                <div className="voice-controls">
-                  {voiceState === "idle" || voiceState === "review" ? (
-                    <button type="button" onClick={() => void startRecording()}>
-                      Use microphone
-                    </button>
-                  ) : voiceState === "requesting" ? (
-                    <button type="button" disabled>
-                      Requesting permission…
-                    </button>
-                  ) : voiceState === "recording" ? (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => stopRecording(false)}
-                      >
-                        Stop · {voiceSeconds}s / 30s
-                      </button>
-                      <button type="button" onClick={() => stopRecording(true)}>
-                        Cancel recording
-                      </button>
-                    </>
-                  ) : (
-                    <button type="button" disabled>
-                      Transcribing…
-                    </button>
-                  )}
-                  {voiceState === "review" && (
-                    <span>Transcript ready—edit it above, then submit.</span>
-                  )}
-                </div>
-                {voiceError && (
-                  <p className="voice-error" role="alert">
-                    {voiceError}
-                  </p>
-                )}
                 <div
-                  className="prompt-suggestions"
-                  aria-label="Example requests"
+                  className="assistant-reply"
+                  role="status"
+                  aria-live="polite"
                 >
-                  {["Live jazz this weekend", "Comedy for two under $80"].map(
-                    (prompt) => (
-                      <button
-                        key={prompt}
-                        type="button"
-                        onClick={() => setConversationMessage(prompt)}
-                      >
-                        {prompt}
-                      </button>
-                    ),
+                  {conversationBusy ? (
+                    <AgentActivity label="Finding the strongest matches" />
+                  ) : (
+                    <>
+                      <span aria-hidden="true">✦</span>
+                      <p>{conversationReply}</p>
+                    </>
                   )}
                 </div>
-                <button
-                  className="concierge-submit"
-                  type="submit"
-                  disabled={conversationBusy || !conversationMessage.trim()}
+                <div
+                  className="speech-controls"
+                  aria-label="Spoken response controls"
                 >
-                  {conversationBusy ? "Planning…" : "Plan my night"}
-                  <span aria-hidden="true">→</span>
-                </button>
-              </form>
-              <p className="concierge-footnote">
-                AI can search and explain. It cannot reserve, pay, or cancel.
-              </p>
+                  <button
+                    className="icon-control"
+                    type="button"
+                    onClick={() => void speakReply()}
+                    disabled={!speechEnabled || speechMuted || speechBusy}
+                    aria-label={
+                      speechBusy
+                        ? "Preparing audio"
+                        : spokenUrl.current
+                          ? "Replay response"
+                          : "Play response"
+                    }
+                    data-tooltip={
+                      spokenUrl.current ? "Replay response" : "Play response"
+                    }
+                  >
+                    {speechBusy ? (
+                      <AudioLines size={15} aria-hidden="true" />
+                    ) : (
+                      <Volume2 size={15} aria-hidden="true" />
+                    )}
+                  </button>
+                  <button
+                    className="icon-control"
+                    type="button"
+                    onClick={() => spokenAudio.current?.pause()}
+                    disabled={!spokenAudio.current}
+                    aria-label="Stop audio"
+                    data-tooltip="Stop audio"
+                  >
+                    <Square size={13} fill="currentColor" aria-hidden="true" />
+                  </button>
+                  <button
+                    className="icon-control"
+                    type="button"
+                    aria-pressed={speechMuted}
+                    aria-label={speechMuted ? "Unmute" : "Mute"}
+                    data-tooltip={speechMuted ? "Unmute" : "Mute"}
+                    onClick={() => setMuted(!speechMuted)}
+                  >
+                    {speechMuted ? (
+                      <VolumeX size={15} aria-hidden="true" />
+                    ) : (
+                      <Volume2 size={15} aria-hidden="true" />
+                    )}
+                  </button>
+                  <button
+                    className="icon-control"
+                    type="button"
+                    aria-pressed={!speechEnabled}
+                    aria-label={
+                      speechEnabled ? "Disable voice" : "Enable voice"
+                    }
+                    data-tooltip={
+                      speechEnabled ? "Disable voice" : "Enable voice"
+                    }
+                    onClick={() => setSpokenEnabled(!speechEnabled)}
+                  >
+                    <Headphones size={15} aria-hidden="true" />
+                  </button>
+                </div>
+                {conversationMeta.length > 0 && (
+                  <div className="conversation-meta">
+                    {conversationMeta.map((item) => (
+                      <span key={item}>{item}</span>
+                    ))}
+                  </div>
+                )}
+                <form className="concierge-form" onSubmit={submitConversation}>
+                  <label htmlFor="event-request">
+                    What are you in the mood for?
+                  </label>
+                  <textarea
+                    id="event-request"
+                    value={conversationMessage}
+                    onChange={(event) =>
+                      setConversationMessage(event.target.value)
+                    }
+                    maxLength={500}
+                    rows={3}
+                    placeholder="A funny date night next Friday, under $80 each…"
+                  />
+                  <div className="voice-controls">
+                    {voiceState === "idle" || voiceState === "review" ? (
+                      <button
+                        className="icon-control icon-control--composer"
+                        type="button"
+                        onClick={() => void startRecording()}
+                        aria-label="Use microphone"
+                        data-tooltip="Use microphone"
+                      >
+                        <Mic size={16} aria-hidden="true" />
+                      </button>
+                    ) : voiceState === "requesting" ? (
+                      <button type="button" disabled>
+                        Requesting permission…
+                      </button>
+                    ) : voiceState === "recording" ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => stopRecording(false)}
+                        >
+                          Stop · {voiceSeconds}s / 30s
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => stopRecording(true)}
+                        >
+                          Cancel recording
+                        </button>
+                      </>
+                    ) : (
+                      <button type="button" disabled>
+                        Transcribing…
+                      </button>
+                    )}
+                    {voiceState === "review" && (
+                      <span>Transcript ready—edit it above, then submit.</span>
+                    )}
+                  </div>
+                  {voiceError && (
+                    <p className="voice-error" role="alert">
+                      {voiceError}
+                    </p>
+                  )}
+                  <div
+                    className="prompt-suggestions"
+                    aria-label="Example requests"
+                  >
+                    {["Live jazz this weekend", "Comedy for two under $80"].map(
+                      (prompt) => (
+                        <button
+                          key={prompt}
+                          type="button"
+                          onClick={() => setConversationMessage(prompt)}
+                        >
+                          {prompt}
+                        </button>
+                      ),
+                    )}
+                  </div>
+                  <button
+                    className="concierge-submit"
+                    type="submit"
+                    disabled={conversationBusy || !conversationMessage.trim()}
+                  >
+                    {conversationBusy ? "Planning…" : "Plan my night"}
+                    <ArrowUp size={16} aria-hidden="true" />
+                  </button>
+                </form>
+                <p className="concierge-footnote">
+                  AI can search and explain. It cannot reserve, pay, or cancel.
+                </p>
+              </div>
             </div>
           </div>
         </section>
@@ -1086,25 +1189,25 @@ export function App() {
         >
           <div className="section-intro">
             <div>
-              <p className="step-label">Prefer precision?</p>
-              <h2 id="discover-title">Build the search yourself.</h2>
+              <p className="step-label">Structured discovery</p>
+              <h2 id="discover-title">Every detail, in your hands.</h2>
             </div>
             <p>
-              The exact same governed discovery path works without AI. Every
-              input remains visible and editable.
+              Prefer precise controls? Use the same discovery engine with every
+              constraint visible and editable.
             </p>
           </div>
           <form className="search-card" onSubmit={submitSearch}>
             <div className="form-heading">
               <div>
-                <p className="step-label">Exact filters</p>
-                <h3>Search New York</h3>
+                <p className="step-label">Your search</p>
+                <h3>What does a great night look like?</h3>
               </div>
               <label className="mode-field">
                 Data source
                 <select name="mode" defaultValue="live">
-                  <option value="live">Live with demo fallback</option>
-                  <option value="fixture">Demo fixtures only</option>
+                  <option value="live">Live results</option>
+                  <option value="fixture">Sample results</option>
                 </select>
               </label>
             </div>
@@ -1183,6 +1286,7 @@ export function App() {
             <div className="form-action">
               <p>Up to 30 days · Provider availability is not guaranteed</p>
               <button type="submit" disabled={searchState === "loading"}>
+                <Search size={16} aria-hidden="true" />
                 {searchState === "loading" ? "Searching…" : "Find events"}
               </button>
             </div>
@@ -1197,7 +1301,7 @@ export function App() {
         >
           {searchState === "loading" && (
             <div className="state-card">
-              Checking the provider and ranking the evidence…
+              <AgentActivity label="Checking live inventory and ranking the evidence" />
             </div>
           )}
           {searchState === "error" && (
@@ -1220,9 +1324,7 @@ export function App() {
                 <span
                   className={`source-pill source-pill--${result.data.mode}`}
                 >
-                  {result.data.mode === "live"
-                    ? "Live provider data"
-                    : "Demo fixture data"}
+                  {result.data.mode === "live" ? "Live results" : "Sample data"}
                 </span>
               </div>
               {fallback && (
@@ -1305,11 +1407,9 @@ export function App() {
               <p className="step-label">Durable drafts</p>
               <h2 id="plans-title">My Plans</h2>
             </div>
-            <span className="source-pill source-pill--fixture">Demo only</span>
           </div>
           <p className="plans-intro">
-            Saved events are private to this guest browser session. Stripe runs
-            in test mode; Scout never creates a real charge or event ticket.
+            Saved events stay private to this browser until you check out.
           </p>
           {commerceNotice && (
             <div className="notice" role="status">
@@ -1350,10 +1450,10 @@ export function App() {
                     )}
                     {plan.state === "confirmed" && plan.checkout && (
                       <div className="demo-receipt">
-                        <strong>Demo receipt</strong>
+                        <strong>Receipt</strong>
                         <span>
                           ${(plan.checkout.amountMinor / 100).toFixed(2)}{" "}
-                          {plan.checkout.currency.toUpperCase()} test payment
+                          {plan.checkout.currency.toUpperCase()}
                         </span>
                         <span>Receipt {plan.checkout.id}</span>
                         <span>
@@ -1364,16 +1464,15 @@ export function App() {
                               ).toLocaleString()
                             : "by verified webhook"}
                         </span>
-                        <em>No Ticketmaster ticket was issued.</em>
+                        <em>Test mode · no event ticket was issued.</em>
                       </div>
                     )}
                     {reviewingPlan === plan.id && plan.state === "draft" && (
                       <div className="confirmation-card" role="group">
-                        <strong>Confirm sandbox checkout</strong>
+                        <strong>Review test checkout</strong>
                         <p>
-                          Stripe will simulate a $1.00 USD payment. This amount
-                          is unrelated to the provider price and creates no real
-                          charge, reservation, or ticket.
+                          Stripe will simulate a $1.00 USD payment. It creates
+                          no real charge, reservation, or event ticket.
                         </p>
                         <div>
                           <button
@@ -1399,10 +1498,10 @@ export function App() {
                     {reviewingPlan === plan.id &&
                       plan.state === "confirmed" && (
                         <div className="confirmation-card" role="group">
-                          <strong>Confirm demo cancellation</strong>
+                          <strong>Review test cancellation</strong>
                           <p>
                             This requests a refund of the $1.00 Stripe test
-                            payment. It does not cancel a provider ticket.
+                            payment. It does not cancel an event ticket.
                           </p>
                           <div>
                             <button
@@ -1431,7 +1530,7 @@ export function App() {
                         className="commerce-button"
                         onClick={() => setReviewingPlan(plan.id)}
                       >
-                        Review $1 sandbox checkout
+                        Review $1 test checkout
                       </button>
                     )}
                     {plan.state === "confirmed" &&
@@ -1441,7 +1540,7 @@ export function App() {
                           className="secondary-button"
                           onClick={() => setReviewingPlan(plan.id)}
                         >
-                          Cancel demo reservation
+                          Cancel test reservation
                         </button>
                       )}
                   </div>
@@ -1449,7 +1548,7 @@ export function App() {
                     <span>
                       {plan.event.source === "ticketmaster"
                         ? "Ticketmaster snapshot"
-                        : "Demo fixture snapshot"}
+                        : "Sample event snapshot"}
                     </span>
                     <span>
                       Saved {new Date(plan.createdAt).toLocaleString()}
@@ -1477,13 +1576,13 @@ export function App() {
               disabled={lifecycleBusy || plans.length === 0}
               onClick={() => void refreshStatuses()}
             >
+              <RefreshCw size={15} aria-hidden="true" />
               Refresh provider status
             </button>
           </div>
           <p className="plans-intro">
-            Preferences remain editable. Status checks use provider facts;
-            alerts never claim availability. Help requests create inspectable
-            demo records, not staffed support.
+            Keep preferences current, recheck saved events, or ask for help.
+            Availability always comes from the event provider.
           </p>
           {lifecycleNotice && (
             <div className="notice" role="status">
@@ -1775,32 +1874,41 @@ export function App() {
           <article>
             <span>01</span>
             <h2>Live sources</h2>
-            <p>Provider, freshness, and missing-price details stay visible.</p>
+            <p>Fresh event details with source and pricing context.</p>
           </article>
           <article>
             <span>02</span>
             <h2>Explainable fit</h2>
-            <p>
-              Code ranks the evidence; AI never creates availability or price.
-            </p>
+            <p>Clear reasons show why each recommendation fits your request.</p>
           </article>
           <article>
             <span>03</span>
-            <h2>Governed sandbox</h2>
-            <p>
-              Explicit confirmation starts a test payment; only a verified
-              webhook can confirm the demo reservation.
-            </p>
+            <h2>You stay in control</h2>
+            <p>Scout asks before every checkout, cancellation, or refund.</p>
           </article>
         </section>
       </main>
 
       <footer>
-        <p>
-          Scout is a feasibility demo. It does not sell or issue real tickets.
-        </p>
+        <p>Live discovery · Stripe test checkout</p>
       </footer>
     </div>
+  );
+}
+
+function AgentActivity({ label }: { label: string }) {
+  return (
+    <span className="agent-activity">
+      <span className="pixel-loader" aria-hidden="true">
+        {Array.from({ length: 9 }, (_, index) => (
+          <span
+            key={index}
+            style={{ animationDelay: `${(index % 4) * 90}ms` }}
+          />
+        ))}
+      </span>
+      <span className="agent-activity-label">{label}</span>
+    </span>
   );
 }
 
@@ -1813,7 +1921,7 @@ function planStateLabel(plan: SavedPlan) {
         : "Draft · no payment";
   }
   if (plan.state === "payment_pending") return "Test payment · verifying";
-  if (plan.state === "confirmed") return "Confirmed · demo reservation";
+  if (plan.state === "confirmed") return "Confirmed · test reservation";
   if (plan.state === "cancellation_pending")
     return "Cancellation · test refund pending";
   return "Cancelled · test refund complete";
@@ -1866,6 +1974,7 @@ function EventCard({
           disabled={saving || saved}
           onClick={() => void onSave(event)}
         >
+          <Bookmark size={15} aria-hidden="true" />
           {saving ? "Saving…" : saved ? "Saved to My Plans" : "Save as draft"}
         </button>
         <details>
@@ -1877,7 +1986,7 @@ function EventCard({
                 <dd>
                   {event.source === "ticketmaster"
                     ? "Ticketmaster Discovery"
-                    : "Scout demo fixture"}
+                    : "Scout sample data"}
                 </dd>
               </div>
               <div>
@@ -1894,11 +2003,11 @@ function EventCard({
               </div>
             </dl>
             <a href={event.providerUrl} target="_blank" rel="noreferrer">
-              Open provider page <span aria-hidden="true">↗</span>
+              Open provider page <ExternalLink size={14} aria-hidden="true" />
             </a>
             <p>
               {event.source === "fixture"
-                ? "Demo event only; this is not real inventory."
+                ? "Sample event—not live inventory."
                 : "Provider availability, fees, and final price may differ."}
             </p>
           </div>

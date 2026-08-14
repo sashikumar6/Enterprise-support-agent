@@ -17,10 +17,8 @@ test("completes the production Stripe test-mode golden path", async ({
   await page.getByRole("button", { name: "Save as draft" }).click();
   await expect(page.getByText("Draft · no payment")).toBeVisible();
 
-  await page
-    .getByRole("button", { name: "Review $1 sandbox checkout" })
-    .click();
-  await expect(page.getByText("Confirm sandbox checkout")).toBeVisible();
+  await page.getByRole("button", { name: "Review $1 test checkout" }).click();
+  await expect(page.getByText("Review test checkout")).toBeVisible();
   await page
     .getByRole("button", { name: "Confirm and continue to Stripe" })
     .click();
@@ -63,15 +61,15 @@ test("completes the production Stripe test-mode golden path", async ({
   await page.waitForURL(/scout-production\.veeravaagu-vishal\.workers\.dev/, {
     timeout: 60_000,
   });
-  await expect(page.getByText("Confirmed · demo reservation")).toBeVisible({
+  await expect(page.getByText("Confirmed · test reservation")).toBeVisible({
     timeout: 30_000,
   });
   await expect(
-    page.getByText("No Ticketmaster ticket was issued."),
+    page.getByText("Test mode · no event ticket was issued."),
   ).toBeVisible();
 
-  await page.getByRole("button", { name: "Cancel demo reservation" }).click();
-  await expect(page.getByText("Confirm demo cancellation")).toBeVisible();
+  await page.getByRole("button", { name: "Cancel test reservation" }).click();
+  await expect(page.getByText("Review test cancellation")).toBeVisible();
   await page.getByRole("button", { name: "Confirm test refund" }).click();
   await expect(
     page.getByText(

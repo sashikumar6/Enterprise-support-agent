@@ -16,7 +16,9 @@ test("serves a responsive, keyboard-oriented public shell", async ({
   await expect(
     page.getByRole("heading", { name: "Your night, handled." }),
   ).toBeVisible();
-  await expect(page.getByText("Scout is a feasibility demo.")).toBeVisible();
+  await expect(
+    page.getByText("Live discovery · Stripe test checkout"),
+  ).toBeVisible();
   await expect(page.getByRole("main")).toBeVisible();
 
   await page.keyboard.press("Tab");
