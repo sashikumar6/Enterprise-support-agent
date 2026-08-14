@@ -1,6 +1,6 @@
 # Scout project handoff
 
-Status: Phase 5 implementation complete; live Stripe sandbox acceptance pending
+Status: Phase 5 complete; Phase 6 AI orchestration is next
 Last updated: 2026-08-14
 Working name: **Scout** (provisional; perform a naming/trademark check before public launch)
 
@@ -1237,7 +1237,7 @@ replays. My Plans persists across reloads and clearly states that drafts are not
 tickets, or purchases. Unit/API tests, local D1 migration, production builds, and desktop/mobile
 browser journeys passed. The contract and evidence are recorded in `docs/PLANS_ACCEPTANCE.md`.
 
-### Phase 5: Stripe sandbox — implementation complete; acceptance pending
+### Phase 5: Stripe sandbox — complete 2026-08-14
 
 Outcome: a test payment drives a reservation through a verified webhook.
 
@@ -1260,10 +1260,13 @@ renders pending states, a persistent demo receipt, and a two-step test-refund fl
 claiming Ticketmaster fulfillment. Formatting, lint, type checking, secret scanning, 41
 automated tests, local migrations, and production builds pass.
 
-Acceptance status: **PENDING**. The required real Stripe test-mode browser journey has not run.
-The local database currently contains drafts only and no checkout or payment events. Complete
-the success/webhook/receipt and cancellation/refund journey before changing this phase to
-complete or beginning Phase 6. The evidence checklist is `docs/STRIPE_ACCEPTANCE.md`.
+Acceptance result: **VERIFIED COMPLETE**. On 2026-08-14, a live Stripe test-mode checkout drove
+the owned reservation from `payment_pending` to `confirmed` through the signature-verified
+webhook. The persistent receipt retained the no-ticket disclosure. Explicit cancellation created
+a test refund; verified refund events advanced the durable state through `cancellation_pending`
+to `cancelled`. D1 inspection confirmed succeeded checkout/refund state, complete transition
+history, provider identifiers without sensitive card data, and safe replay behavior. The evidence
+checklist is `docs/STRIPE_ACCEPTANCE.md`.
 
 ### Phase 6: AI orchestration
 
@@ -1575,18 +1578,15 @@ provider-sandbox, browser, or deployment check remains, label the phase implemen
 and acceptance pending. Reason: the durable handoff must describe verified repository state
 without relying on the owner to request documentation updates after each phase.
 
+### 2026-08-14 — Complete Stripe sandbox acceptance before AI
+
+Decision: close Phase 5 only after a real Stripe test-mode checkout, verified webhook receipt,
+persistent demo receipt, explicit cancellation, test refund, duplicate replay, and durable D1
+state inspection all pass. Keep Stripe-hosted collection and store only provider identifiers.
+Reason: browser return redirects and owner confirmation alone are not authoritative evidence of
+payment or refund state, and Scout must never imply that its sandbox flow issued an event ticket.
+
 ## 29. Immediate next action for a new Codex session
 
-Phase 5 implementation is complete, but acceptance is still pending. Do not begin Phase 6 or
-label Phase 5 complete until the live Stripe sandbox journey passes.
-
-1. Start Scout locally with the ignored `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` values.
-2. Keep Stripe CLI forwarding the documented event allowlist to `/api/v1/stripe/webhook`.
-3. Complete the browser journey: fixture search -> save draft -> explicit confirmation ->
-   Stripe-hosted $1.00 test checkout -> verified webhook -> persistent demo receipt.
-4. Verify D1 contains a `succeeded` checkout, `confirmed` reservation, applied provider event,
-   transition/audit records, and no sensitive payment data.
-5. Explicitly cancel the demo reservation, verify the test refund webhook, and confirm durable
-   `cancelled`/`succeeded` states. Keep failed/expired and replay behavior covered by tests.
-6. Complete `docs/STRIPE_ACCEPTANCE.md`, then update this handoff to `Phase 5 complete; Phase 6
-AI orchestration is next` before beginning Phase 6.
+Phase 5 is verified complete. Phase 6 AI orchestration is next; follow its implementation and
+acceptance criteria above before beginning Phase 7.

@@ -31,15 +31,27 @@ and refund path also completes without implying a real Ticketmaster purchase.
 
 ## Live sandbox evidence
 
-Status: **PENDING** as of 2026-08-14.
+Status: **VERIFIED COMPLETE** on 2026-08-14.
 
-- [ ] Stripe-hosted test checkout returns to Scout.
-- [ ] Verified `checkout.session.completed` event is applied exactly once.
-- [ ] Checkout becomes `succeeded` and reservation becomes `confirmed`.
-- [ ] Demo receipt persists after reload and states that no real ticket was issued.
-- [ ] Explicit cancellation creates a Stripe test refund.
-- [ ] Verified refund event advances the reservation to `cancelled`.
-- [ ] Replayed webhook is a safe no-op.
-- [ ] Database inspection confirms no raw card or sensitive payment data is stored.
+- [x] Stripe-hosted test checkout returns to Scout.
+- [x] Verified `checkout.session.completed` event is applied exactly once.
+- [x] Checkout becomes `succeeded` and reservation becomes `confirmed`.
+- [x] Demo receipt persists after reload and states that no real ticket was issued.
+- [x] Explicit cancellation creates a Stripe test refund.
+- [x] Verified refund event advances the reservation to `cancelled`.
+- [x] Replayed webhook is a safe no-op.
+- [x] Database inspection confirms no raw card or sensitive payment data is stored.
 
-Do not mark Phase 5 complete or begin Phase 6 until every live item above has evidence.
+Live evidence: Stripe Checkout accepted the documented `4242` test card after its test-mode
+verification step. The CLI listener delivered `refund.created` and `refund.updated` to the local
+signature-verified endpoint, and Scout returned HTTP 200 for both. The browser showed the durable
+demo receipt after reload, including the no-ticket disclosure, and later showed
+`Cancelled · test refund complete` after reload.
+
+Local D1 inspection confirmed the tested reservation is `cancelled`, its checkout and refund are
+both `succeeded`, the amount is 100 USD minor units, and Stripe checkout, payment, and refund IDs
+are present. The transition history is `draft` -> `payment_pending` -> `confirmed` ->
+`cancellation_pending` -> `cancelled`. One refund terminal event applied and the second equivalent
+terminal event was rejected without changing state. Replaying the identical signed checkout event
+again returned HTTP 200 without adding another payment-event record. The schema and stored record
+contain provider identifiers only—no raw card number, CVC, or other sensitive payment data.
