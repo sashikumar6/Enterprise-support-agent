@@ -5,6 +5,13 @@ export interface Bindings {
   TICKETMASTER_API_KEY?: string;
   STRIPE_SECRET_KEY?: string;
   STRIPE_WEBHOOK_SECRET?: string;
+  OPS_ACCESS_TOKEN?: string;
+  COSTLY_RATE_LIMITER?: RateLimit;
+  MUTATION_RATE_LIMITER?: RateLimit;
+  AUTH_RATE_LIMITER?: RateLimit;
+  AI?: {
+    run(model: string, input: unknown, options?: unknown): Promise<unknown>;
+  };
 }
 
 const allowedEnvironments = new Set([
@@ -23,5 +30,14 @@ export function validateEnvironment(bindings: Bindings): void {
 
   if (!bindings.DB) {
     throw new Error("DB binding is required");
+  }
+
+  if (
+    (bindings.APP_ENV === "preview" || bindings.APP_ENV === "production") &&
+    (!bindings.COSTLY_RATE_LIMITER ||
+      !bindings.MUTATION_RATE_LIMITER ||
+      !bindings.AUTH_RATE_LIMITER)
+  ) {
+    throw new Error("Release environments require every rate-limit binding");
   }
 }

@@ -3,6 +3,7 @@ export type DiscoveryMode = "live" | "fixture";
 export type EventCategory =
   "all" | "music" | "sports" | "arts" | "comedy" | "family";
 export type TimePreference = "any" | "daytime" | "evening";
+export const EXACT_START_WINDOW_MINUTES = 30;
 
 export interface EventSearchConstraints {
   city: "New York";
@@ -12,12 +13,14 @@ export interface EventSearchConstraints {
   budgetMax: number | null;
   partySize: number;
   timePreference: TimePreference;
+  exactStartTime: string | null;
 }
 
 export interface EventSummary {
   id: string;
   source: EventSource;
   name: string;
+  attractionId: string | null;
   startsAt: string | null;
   localDate: string;
   localTime: string | null;
@@ -54,6 +57,7 @@ export interface EventSearchResult {
   mode: DiscoveryMode;
   requestedMode: DiscoveryMode;
   events: RankedEvent[];
+  alternatives: RankedEvent[];
   observedAt: string;
   fallbackReason:
     | "missing_key"

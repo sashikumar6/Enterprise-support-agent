@@ -57,6 +57,7 @@ function fixtureEvents(
       id: `fixture-${id}`,
       source: "fixture",
       name,
+      attractionId: `fixture-attraction-${id}`,
       startsAt: `${constraints.startDate}T${localTime}-04:00`,
       localDate: constraints.startDate,
       localTime,

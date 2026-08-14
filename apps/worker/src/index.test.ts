@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import type {
+  AIProvider,
   CheckoutLaunch,
   CommerceRepository,
   CreateDraftPlan,
@@ -70,6 +71,7 @@ const normalizedEvent = {
   id: "fixture-comedy",
   source: "fixture" as const,
   name: "Friday Night Comedy — Demo Event",
+  attractionId: "fixture-attraction-comedy",
   startsAt: "2026-08-14T20:00:00Z",
   localDate: "2026-08-14",
   localTime: "20:00:00",
@@ -193,6 +195,24 @@ const stripeBindings = {
   STRIPE_WEBHOOK_SECRET: "whsec_example",
 };
 
+const aiProvider: AIProvider = {
+  extractSearchIntent: vi.fn(async () => ({
+    action: "search_events" as const,
+    startDate: "2026-08-14",
+    endDate: "2026-08-20",
+    category: "comedy" as const,
+    budgetMax: 80,
+    partySize: 2,
+    timePreference: "evening" as const,
+    exactStartTime: null,
+    missingFields: [],
+  })),
+};
+const conversationApp = createApp({
+  clock: () => new Date("2026-08-13T16:00:00Z"),
+  aiProvider,
+});
+
 class WebhookCommerceRepository extends MemoryCommerceRepository {
   private readonly events = new Set<string>();
 
@@ -282,6 +302,11 @@ describe("Scout API foundation", () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get("x-request-id")).toBe("test-request-1");
+    expect(response.headers.get("x-frame-options")).toBe("DENY");
+    expect(response.headers.get("x-content-type-options")).toBe("nosniff");
+    expect(response.headers.get("content-security-policy")).toContain(
+      "frame-ancestors 'none'",
+    );
     await expect(response.json()).resolves.toMatchObject({
       status: "ok",
       service: "scout",
@@ -348,21 +373,211 @@ describe("Scout API foundation", () => {
   it("rate limits repeated searches from the same browser session", async () => {
     const url =
       "/api/v1/events/search?city=New%20York&startDate=2026-08-14&endDate=2026-08-20&mode=fixture";
-    const first = await app.request(
-      url,
-      { headers: { "x-scout-session": "rate-contract" } },
-      bindings,
-    );
+    for (let attempt = 0; attempt < 10; attempt += 1) {
+      const allowed = await app.request(
+        url,
+        { headers: { "x-scout-session": "rate-contract" } },
+        bindings,
+      );
+      expect(allowed.status).toBe(200);
+    }
     const repeated = await app.request(
       url,
       { headers: { "x-scout-session": "rate-contract" } },
       bindings,
     );
 
-    expect(first.status).toBe(200);
     expect(repeated.status).toBe(429);
+    expect(repeated.headers.get("retry-after")).toBe("60");
     await expect(repeated.json()).resolves.toMatchObject({
-      error: { code: "SEARCH_RATE_LIMITED" },
+      error: { code: "RATE_LIMITED" },
+    });
+  });
+
+  it("uses server-owned identity instead of a spoofable client header", async () => {
+    const keys: string[] = [];
+    const protectedApp = createApp({
+      resolveSession: async () => "server-owned-guest",
+      rateLimit: async (_scope, key) => {
+        keys.push(key);
+        return keys.length === 1;
+      },
+    });
+    const url =
+      "/api/v1/events/search?city=New%20York&startDate=2026-08-14&endDate=2026-08-20&mode=fixture";
+    const first = await protectedApp.request(
+      url,
+      { headers: { "x-scout-session": "spoof-a" } },
+      bindings,
+    );
+    const second = await protectedApp.request(
+      url,
+      { headers: { "x-scout-session": "spoof-b" } },
+      bindings,
+    );
+
+    expect(first.status).toBe(200);
+    expect(second.status).toBe(429);
+    expect(keys).toEqual([
+      "/api/v1/events/search:server-owned-guest",
+      "/api/v1/events/search:server-owned-guest",
+    ]);
+  });
+
+  it("rejects cross-origin mutations and oversized bodies before parsing", async () => {
+    const crossOrigin = await planApp.request(
+      "/api/v1/plans",
+      {
+        method: "POST",
+        headers: {
+          origin: "https://attacker.example",
+          "content-type": "application/json",
+        },
+        body: "{}",
+      },
+      bindings,
+    );
+    expect(crossOrigin.status).toBe(403);
+    await expect(crossOrigin.json()).resolves.toMatchObject({
+      error: { code: "CROSS_ORIGIN_REQUEST" },
+    });
+
+    const oversized = await app.request(
+      "/api/v1/conversations/messages",
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "content-length": "65537",
+          "x-scout-session": "oversized-contract",
+        },
+        body: "{}",
+      },
+      bindings,
+    );
+    expect(oversized.status).toBe(413);
+    await expect(oversized.json()).resolves.toMatchObject({
+      error: { code: "REQUEST_TOO_LARGE" },
+    });
+  });
+});
+
+describe("conversational discovery API", () => {
+  it("uses a validated read-only tool and returns ranked provider facts", async () => {
+    const response = await conversationApp.request(
+      "/api/v1/conversations/messages",
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-scout-session": "conversation-results",
+        },
+        body: JSON.stringify({
+          message: "Funny date night next week under $80",
+          mode: "fixture",
+          history: [],
+        }),
+      },
+      bindings,
+    );
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      data: {
+        status: "results",
+        modelUsed: true,
+        toolCalls: [{ name: "search_events", status: "completed" }],
+        result: {
+          mode: "fixture",
+          events: [{ id: "fixture-comedy", source: "fixture" }],
+        },
+      },
+    });
+  });
+
+  it("keeps next Friday distinct from this Friday when today is Friday", async () => {
+    const nextFridayApp = createApp({
+      clock: () => new Date("2026-08-14T16:00:00Z"),
+      aiProvider: {
+        extractSearchIntent: vi.fn(async () => ({
+          action: "search_events" as const,
+          startDate: "2026-08-14",
+          endDate: "2026-08-14",
+          category: "all" as const,
+          budgetMax: 80,
+          partySize: 2,
+          timePreference: "any" as const,
+          exactStartTime: null,
+          missingFields: [],
+        })),
+      },
+    });
+    const response = await nextFridayApp.request(
+      "/api/v1/conversations/messages",
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-scout-session": "next-friday-contract",
+        },
+        body: JSON.stringify({
+          message: "Find a show in New York under $80 next Friday",
+          mode: "fixture",
+          history: [],
+        }),
+      },
+      bindings,
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      data: {
+        status: "results",
+        intent: { startDate: "2026-08-21", endDate: "2026-08-21" },
+        constraints: {
+          startDate: "2026-08-21",
+          endDate: "2026-08-21",
+          budgetMax: 80,
+        },
+        assistantMessage: expect.stringContaining("Friday, August 21"),
+      },
+    });
+  });
+
+  it("keeps deterministic discovery available when AI is not configured", async () => {
+    const response = await app.request(
+      "/api/v1/conversations/messages",
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-scout-session": "conversation-fallback",
+        },
+        body: JSON.stringify({ message: "Find jazz this weekend" }),
+      },
+      bindings,
+    );
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      data: { status: "fallback", modelUsed: false, toolCalls: [] },
+    });
+  });
+
+  it("rejects oversized prompts before model use", async () => {
+    const response = await conversationApp.request(
+      "/api/v1/conversations/messages",
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-scout-session": "conversation-invalid",
+        },
+        body: JSON.stringify({ message: "x".repeat(501) }),
+      },
+      bindings,
+    );
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toMatchObject({
+      error: { code: "INVALID_CONVERSATION" },
     });
   });
 });

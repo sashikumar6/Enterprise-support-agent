@@ -7,6 +7,7 @@ import {
 } from "@scout/core";
 
 const API_URL = "https://app.ticketmaster.com/discovery/v2/events.json";
+const EVENT_API_URL = "https://app.ticketmaster.com/discovery/v2/events";
 const classifications = {
   music: "Music",
   sports: "Sports",
@@ -36,6 +37,13 @@ function records(value: unknown): Record<string, unknown>[] {
 
 function text(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value : null;
+}
+
+function classificationText(value: unknown): string | null {
+  const candidate = text(value);
+  return candidate && !/^(?:undefined|null|unknown)$/i.test(candidate)
+    ? candidate
+    : null;
 }
 
 function number(value: unknown): number | null {
@@ -89,6 +97,7 @@ export function normalizeTicketmasterEvent(
   if (!id || !name || !providerUrl || !localDate) return null;
 
   const venue = records(nested(event, "_embedded", "venues"))[0];
+  const attraction = records(nested(event, "_embedded", "attractions"))[0];
   const classification = records(event.classifications)[0];
   const priceRange = records(event.priceRanges)[0];
   const minimum = number(priceRange?.min);
@@ -100,6 +109,7 @@ export function normalizeTicketmasterEvent(
     id,
     source: "ticketmaster",
     name,
+    attractionId: text(attraction?.id),
     providerUrl,
     startsAt: text(nested(event, "dates", "start", "dateTime")),
     localDate,
@@ -113,9 +123,9 @@ export function normalizeTicketmasterEvent(
     observedAt,
     status: text(nested(event, "dates", "status", "code")),
     classification: {
-      segment: text(nested(classification, "segment", "name")),
-      genre: text(nested(classification, "genre", "name")),
-      subGenre: text(nested(classification, "subGenre", "name")),
+      segment: classificationText(nested(classification, "segment", "name")),
+      genre: classificationText(nested(classification, "genre", "name")),
+      subGenre: classificationText(nested(classification, "subGenre", "name")),
     },
     image: image?.url
       ? { url: image.url, width: image.width, height: image.height }
@@ -195,5 +205,24 @@ export class TicketmasterEventProvider implements EventProvider {
         .map((event) => normalizeTicketmasterEvent(event, observedAt))
         .filter((event): event is EventSummary => event !== null),
     };
+  }
+
+  async status(eventId: string): Promise<string | null> {
+    const url = new URL(`${EVENT_API_URL}/${encodeURIComponent(eventId)}.json`);
+    url.searchParams.set("apikey", this.apiKey);
+    let response: Response;
+    try {
+      response = await this.fetcher(url, {
+        headers: { accept: "application/json" },
+      });
+    } catch {
+      throw new EventProviderError("unavailable");
+    }
+    if (response.status === 429) throw new EventProviderError("rate_limited");
+    if (response.status === 401 || response.status === 403)
+      throw new EventProviderError("unauthorized");
+    if (!response.ok) throw new EventProviderError("unavailable");
+    const payload = await response.json<unknown>();
+    return text(nested(payload, "dates", "status", "code"));
   }
 }

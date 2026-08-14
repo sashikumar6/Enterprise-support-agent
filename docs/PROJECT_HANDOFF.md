@@ -1,6 +1,6 @@
 # Scout project handoff
 
-Status: Phase 5 complete; Phase 6 AI orchestration is next
+Status: Phases 3, 6, 7A, 7, and 8 verified complete; Phase 9 in progress
 Last updated: 2026-08-14
 Working name: **Scout** (provisional; perform a naming/trademark check before public launch)
 
@@ -130,6 +130,25 @@ Help the user move from ambiguous intent to a confident, executable plan.
 - System/provider status display
 - Persistent preferences, event-status monitoring, and proactive in-app alerts
 - Live-provider, deterministic-fallback, and fixture-demo modes with visible labeling
+
+#### Geographic scope — New York only in the current implementation
+
+Scout does **not** currently work for arbitrary locations. The provider-neutral search contract,
+runtime validation, Workers AI prompt, fixture data, ranking assumptions, and UI are deliberately
+limited to New York City. A Boston request is rejected before Ticketmaster is called. The Phase 1
+spike showed useful Boston and Philadelphia inventory, but that evidence did not implement or
+accept multi-city behavior.
+
+Do not describe Scout as working “anywhere,” “nationwide,” or in every Ticketmaster market. A
+multi-city expansion needs an explicit owner decision and a separate vertical acceptance gate:
+
+- replace the New York string literal with a validated provider-neutral place contract;
+- resolve city/state/country and event timezone without letting the model invent geography;
+- define ambiguity behavior for duplicate city names and unsupported markets;
+- run data-quality and live/browser relevance cases for every advertised launch city;
+- verify relative dates, exact local times, ranking, fallback labels, and saved snapshots in each
+  supported timezone;
+- preserve a truthful unsupported-location response instead of silently substituting New York.
 
 ### 5.5 Navan-inspired capability parity
 
@@ -594,6 +613,35 @@ The product must still function when every LLM quota is exhausted:
 
 Optional Ollama can support local development but cannot be the fallback for a public Worker
 unless a separately hosted machine is always available.
+
+### 11.5 Why Scout combines AI with deterministic decisions
+
+AI and deterministic code have different jobs; replacing the latter with a “smarter” prompt would
+weaken the product.
+
+Use AI for probabilistic language work:
+
+- interpreting an open-ended request;
+- extracting candidate constraints;
+- identifying ambiguity and asking a natural clarification;
+- explaining already-ranked provider results in user-friendly language;
+- summarizing bounded conversation context.
+
+Use deterministic, testable code for authority and invariants:
+
+- supported geography, calendar arithmetic, timezone conversion, and exact-time windows;
+- schema/range validation, hard filters, ranking components, and diversity rules;
+- event existence, provider price/status/source/freshness, and missing-data handling;
+- ownership, confirmation, checkout, webhook, reservation, cancellation, and refund state;
+- rate limits, idempotency, audit records, and fallback selection.
+
+Models are probabilistic and can return a valid schema with a semantically wrong date—as the
+`this Friday` and `next Friday` regressions demonstrated. They also change across model versions
+and cannot be the source of truth for provider or transaction facts. Deterministic code does not
+mean hard-coded recommendations: it means the model proposes intent, provider APIs supply facts,
+and reproducible application rules decide what satisfies the stated constraints. Future AI can
+improve clarification, preference interpretation, and explanation, but may not bypass these
+boundaries.
 
 ## 12. GCP, gRPC, Google APIs, and protocol clarification
 
@@ -1130,6 +1178,39 @@ latency, and cost/quota consumption. Do not rely only on “looks good” manual
 - Dependency/security audit with reviewed exceptions
 - Playwright smoke test against preview deployment where feasible
 
+### Mandatory acceptance discipline for Phases 8–10
+
+The Phase 3/6/7A regressions showed that passing schemas, fixtures, and happy-path API calls do not
+prove product correctness. Every remaining phase must follow this protocol before it is labeled
+complete:
+
+1. Build a requirement-to-evidence matrix before implementation. Include normal, boundary,
+   paired-language (`this` and `next`), ambiguous, empty, malformed, provider-failure, replay, and
+   unauthorized cases relevant to that phase.
+2. Write a failing regression for every defect found by the owner or a live run before changing
+   implementation. Test the user’s exact wording/data as well as the generalized rule.
+3. Test each authority boundary at the lowest useful layer and through the public API/UI. A unit
+   test alone is insufficient for a user-visible claim.
+4. Use fixtures for repeatability, then run the current build against every applicable real
+   provider/sandbox. Record interpreted inputs and returned semantics, not merely HTTP 200 or
+   schema validity.
+5. Exercise the actual desktop/mobile browser surface for visible constraints, empty/error states,
+   labels, controls, accessibility, and stale-build/port isolation. Do not substitute source review
+   for a required manual interaction.
+6. Test paired and inverse cases whenever one linguistic/state case is added: this/next,
+   success/failure, create/replay, owner/non-owner, live/fixture, configured/missing binding, and
+   exact/no-exact match.
+7. Audit claims against provider/database facts and inspect for secrets or unsupported language.
+   The model's output is never evidence by itself.
+8. Run the full repository gates and the phase-specific live/manual checklist. Update the
+   acceptance document, phase result, status line, decision log, and immediate next action in the
+   same change.
+9. If any required browser, provider, deployment, migration, security, or manual check is pending,
+   label implementation complete and acceptance pending. Do not start the next phase.
+
+Phases 8–10 must preserve a versioned regression corpus. A later Codex session may expand it but
+must not delete inconvenient cases or weaken assertions merely to make a gate pass.
+
 ## 22. Delivery plan and senior-development sequence
 
 ### Phase 0: pivot and prepare
@@ -1187,7 +1268,7 @@ formatting, linting, typechecking, secret scanning, dry-run Worker builds, and G
 are in place. A clean `npm ci`, local migration, full quality check, live health/readiness
 requests, and both browser projects passed. No Cloudflare account or paid service was required.
 
-### Phase 3: deterministic live-discovery slice — complete 2026-08-13
+### Phase 3: deterministic live-discovery slice — verified complete 2026-08-14
 
 Outcome: a user can search and inspect real events without AI.
 
@@ -1212,6 +1293,16 @@ The responsive UI covers structured constraints, loading/error/empty states, liv
 source and freshness labels, optional prices, score reasons, expandable details, and provider
 links. Unit/API/provider tests, a real bounded Ticketmaster request, and desktop/mobile browser
 journeys passed. The source contract and checks are recorded in `docs/DISCOVERY_ACCEPTANCE.md`.
+
+Reassessment on 2026-08-14: a live New York search exposed
+three weaknesses that the fixture-heavy acceptance did not detect: an exact requested time was
+not represented in the constraint contract, repeated performances of effectively the same
+attraction could dominate the result set because deduplication only removed exact
+name/date/time/venue matches, and a missing classification rendered as `UNDEFINED`. The provider
+adapter, authority boundaries, fallback behavior, and previously verified safety properties are
+not invalidated by this evidence. The corrective Phase 7A implementation, automated/live provider
+checks, and owner-observed interactive browser acceptance now pass. Phase 3 is **VERIFIED
+COMPLETE**; `docs/DISCOVERY_ACCEPTANCE.md` records the evidence.
 
 ### Phase 4: durable plan and commerce state machine — complete 2026-08-13
 
@@ -1268,7 +1359,7 @@ to `cancelled`. D1 inspection confirmed succeeded checkout/refund state, complet
 history, provider identifiers without sensitive card data, and safe replay behavior. The evidence
 checklist is `docs/STRIPE_ACCEPTANCE.md`.
 
-### Phase 6: AI orchestration
+### Phase 6: AI orchestration — verified complete 2026-08-14
 
 Outcome: natural language can drive the existing deterministic use cases safely.
 
@@ -1283,7 +1374,39 @@ Outcome: natural language can drive the existing deterministic use cases safely.
 Verification: eval thresholds are documented and deterministic workflow remains functional
 with the AI provider disabled.
 
-### Phase 7: voice and lifecycle parity
+Implementation result: **COMPLETE**. Scout now has a provider-neutral `AIProvider`, a
+Cloudflare Workers AI JSON-schema adapter, strict runtime output validation, bounded message and
+history context, deterministic context summarization, and a single allowlisted read tool that
+can only call the existing normalized discovery service. Missing bindings, invalid model output,
+quota, and provider failure return users to the fully functional exact-filter path. The consumer
+surface now leads with a Navan-inspired conversational concierge while retaining provider source,
+freshness, missing-price, sandbox, and explicit confirmation language. Automated adapter, domain,
+API, and fallback tests pass.
+
+Initial acceptance result: **SAFETY BOUNDARIES VERIFIED; PRODUCT ACCEPTANCE REOPENED**. On
+2026-08-14, the owner registered a free
+`workers.dev` subdomain and the explicit AI preview connected successfully to Workers AI without
+enabling billing or adding a model key to `.dev.vars`. A clear request extracted all seven stated
+search fields and invoked only the validated `search_events` tool. An underspecified request stayed
+within read-only discovery, and an adversarial request attempting prompt disclosure, purchase, and
+cancellation produced clarification with no tool call or consequential action. Live-model latency
+ranged from 447 to 1,032 ms. With the AI binding removed, the safe fallback returned in 6 ms and
+the deterministic exact-filter search still returned results in 62 ms. The evidence checklist and
+measurements are in `docs/AI_ACCEPTANCE.md`.
+
+Reassessment on 2026-08-14: the evaluation proved bounded structured output, allowlisted
+read-only tool use, adversarial-action refusal, and deterministic fallback, but it did not prove
+that the schema preserved all materially stated constraints or that the answer was grounded in
+the returned events. The schema reduced time to `any|daytime|evening`, so “at 5 PM” could be lost,
+and the assistant returned a generic count instead of explaining which options satisfied the
+request or honestly distinguishing nearest alternatives from matches. The required evaluation
+corpus also called for date ambiguity/time zones, conflicting constraints, and no-result cases;
+the recorded live corpus did not cover all of them. The corrective Phase 7A corpus,
+deterministic grounding, live evaluations, and owner-observed interactive browser and spoken-text
+checks now pass. Phase 6 is **VERIFIED COMPLETE**; the earlier authorization and fallback evidence
+remains valid and `docs/AI_ACCEPTANCE.md` records the combined result.
+
+### Phase 7: voice and lifecycle parity — verified complete 2026-08-14
 
 Outcome: the user can complete the same governed discovery flow by voice and receive useful
 post-reservation assistance.
@@ -1302,6 +1425,93 @@ Verification: microphone denial, silence, unsupported format, transcription fail
 exhaustion, edited transcript, spoken-response controls, typed fallback, event-status change,
 and escalation workflows are covered without weakening confirmation or authorization.
 
+Implementation result: **COMPLETE**. Scout now has a provider-neutral `SpeechProvider` backed by
+Cloudflare-hosted Whisper, MeloTTS, and an error-only Aura-1 fallback, consent-gated browser recording with a visible 30-second
+cap and cancel action, editable transcript review, and optional spoken responses capped at 600
+characters with play/replay, stop, mute, disable, and persistent text parity. Audio input is
+bounded by type, size, and claimed duration; application code does not persist raw audio or log
+transcripts. Speech failures and missing quota/bindings preserve the typed path. Guest-owned D1
+state now stores editable preference profiles, provider status checks, deduplicated in-app alerts,
+and honest unstaffed help-request records. A standalone PWA manifest, icon, and network-first
+service worker complete the responsive installable surface. Automated unit/API coverage and eight
+desktop/mobile Chromium checks pass on an isolated local Worker.
+
+Acceptance result: **VERIFIED COMPLETE**. Real microphone grant and live Whisper transcription
+pass. The same preview exposed Cloudflare `AiError 3043` from MeloTTS; Scout's bounded Aura-1
+fallback returned a valid no-store MP3 in 2,421 ms. On 2026-08-14, the owner confirmed manual
+stop/cancel/automatic-stop recording behavior, edited transcript submission, silence fallback,
+play/replay/stop/mute/disable controls, exact spoken-text parity, and standalone responsive PWA
+installation. The controlled provider-status regression creates a deduplicated owner-scoped alert
+without mutating the saved snapshot. The checklist and evidence are in
+`docs/VOICE_LIFECYCLE_ACCEPTANCE.md`.
+
+### Phase 7A: discovery relevance and conversational grounding — verified complete 2026-08-14
+
+Outcome: typed and transcribed requests preserve material user constraints and produce a small,
+truthful, useful comparison from live provider facts. This corrective gate repairs the reopened
+Phase 3 and Phase 6 acceptance gaps before Phase 7 can close or Phase 8 can begin.
+
+Before implementation, confirm the product meaning of “at 5 PM” with the owner. Recommended
+default: treat it as an event start within 30 minutes before or after 5 PM; if no event matches,
+say that explicitly and present clearly separated nearest alternatives. Do not silently convert an
+exact time into the broad `daytime` or `evening` preference. Because Ticketmaster may not provide
+event duration, Scout must not claim an earlier event is still occurring at 5 PM without provider
+evidence.
+
+- Extend the provider-neutral constraint and structured-intent contracts to retain an exact local
+  time and explicit matching semantics, while preserving the existing coarse time preference.
+- Validate and enforce time constraints deterministically in the New York event timezone; the LLM
+  may extract the constraint but may not decide which provider results satisfy it.
+- Return an honest no-exact-match state and separately labeled nearest alternatives instead of
+  mixing off-time events into matches.
+- Generate the assistant response deterministically from returned provider facts: state the
+  interpreted date/time, match count, and strongest relevant options or the absence of matches.
+- Prevent repeated performances or minor title variants of one attraction from crowding out useful
+  comparison. Document and test the grouping/diversity rule; do not discard distinct performances
+  from the detail path.
+- Render a human fallback such as “Unclassified” for missing classifications; never expose
+  `undefined`, `null`, or another implementation value to the user.
+- Expand the versioned AI evaluation corpus to cover exact time, relative date resolution and New
+  York timezone, conflicting constraints, no exact matches, provider facts with missing fields,
+  repeated performances, malformed model output, and typed/transcribed parity.
+- Audit the Phase 3 and Phase 6 acceptance claims against the master handoff. Preserve passing
+  provider, authorization, fallback, and commerce evidence, but record every uncovered gap instead
+  of broadly relabeling the phases complete.
+
+Verification requires automated regression tests plus a live `dev:ai` browser run using the
+owner's exact request, “What kind of shows are available in New York at 5 PM this Friday?” The
+visible extracted constraints must retain the resolved Friday and exact time; every exact-match
+card must meet the documented window; off-window items must appear only as labeled alternatives;
+the spoken response must exactly match the current visible grounded text; repeated submissions
+must preserve the same interpreted constraints even if provider inventory changes. Record the
+evidence in both `docs/DISCOVERY_ACCEPTANCE.md` and `docs/AI_ACCEPTANCE.md`, then update this
+handoff before resuming the remaining Phase 7 manual checks.
+
+Implementation result: **COMPLETE**. The owner approved a ±30-minute provider-listed start-time
+window. Provider-neutral search and AI intent contracts now retain exact `HH:mm` independently of
+the coarse preference. Deterministic code resolves explicit relative dates in the New York
+timezone, separates exact matches from at most three time-distance-ordered alternatives, grounds
+assistant copy in normalized provider names/times, groups list cards by Ticketmaster attraction ID
+with a normalized-title fallback, and renders missing classifications as `Unclassified`. Typed and
+transcribed inputs use the same contract. A follow-up correction defines paired `this`/`next`
+weekday and weekend semantics, rejects conflicting relative dates, and displays the resolved date
+in the conversation chips. The full repository check passes with 89 automated tests and production
+builds; eight desktop/mobile Playwright journeys pass.
+
+Acceptance result: **VERIFIED COMPLETE**. A first live API run caught Workers AI
+misresolving “this Friday” as a Wednesday-through-September range; the deterministic relative-date
+guard was added and regression-tested. Two subsequent live requests consistently resolved Friday,
+2026-08-14 at 17:00 and returned only 16:30–17:30 exact matches, with 16:00/18:00 alternatives kept
+separate. A live 03:00 search returned zero exact matches and separately ranked alternatives.
+Ticketmaster attraction IDs collapsed live title variants, and missing classifications remained
+human-readable. A later owner-run browser check found that “next Friday”
+still resolved to the current Friday. That missed paired edge case is now regression-tested: two
+live runs consistently resolved 2026-08-21, retained the $80 budget, returned only August 21
+events, and the UI displays `Fri, Aug 21` before user action. On 2026-08-14, the owner repeated both
+requests in `dev:ai` and confirmed the visible dates, exact time, budget, card grouping,
+alternatives, human classification labels, stable interpretation, and spoken-text parity. Phase
+3/6 relevance and Phase 7A are closed.
+
 ### Phase 8: operations and observability
 
 Outcome: reviewer can inspect how the agent and transaction behaved.
@@ -1313,7 +1523,29 @@ Outcome: reviewer can inspect how the agent and transaction behaved.
 - Cloudflare traces/logs
 - Optional local OTel Collector + Jaeger profile
 
-Verification: one correlation ID connects the golden path and no sensitive fields appear.
+Verification: one correlation ID connects the golden path and no sensitive fields appear. Before
+closure, test populated, empty, failure, replay, unauthorized, and provider-degraded timelines
+against real stored audit state; inspect the desktop/mobile operations UI in a browser; compare
+displayed facts with D1/provider logs; and record Cloudflare trace/log evidence. A dashboard that
+only renders fixture cards is not accepted.
+
+Result: **VERIFIED COMPLETE 2026-08-14**. Scout now has a
+server-secret-protected, D1-backed operations summary and correlated timeline covering safe audit,
+tool, provider, reservation-transition, and payment-event facts. The operations contract/API corpus,
+102-test quality gate, local migrations, desktop/mobile browser suite, live Workers AI and
+Ticketmaster request, structured Worker logs, protected API response, and direct D1 comparison all
+pass. The authorized `scout-preview` Worker and remote ENAM D1 are live with all six migrations and
+server-side operator/Ticketmaster/Stripe secrets. A healthy live Ticketmaster request, controlled
+credential-failure fallback, recovery request, protected API timeline, direct remote D1 query, and
+Cloudflare-native tail agree on their safe correlations. Automatic invocation-log persistence is
+disabled after its raw envelope was found to include request headers; allowlisted application logs
+and Cloudflare traces remain enabled.
+
+The owner inspected Cloudflare trace `62a10c89f5c7672f5b4d75f4311817f2` in the dashboard and supplied
+screenshots of its spans and Logs view. The expected root GET, Ticketmaster fetch, D1 tool/provider
+inserts, and two allowlisted application messages were present; no credential, cookie, prompt,
+transcript, raw audio, or payment value appeared. The exact evidence is in
+`docs/OPERATIONS_ACCEPTANCE.md`. Phase 8 is closed and Phase 9 may begin.
 
 ### Phase 9: production hardening and public release
 
@@ -1329,7 +1561,10 @@ Outcome: stable resume link and reproducible repository.
 - Recruiter demo script and screenshots
 - Final README and resume bullets
 
-Verification: a new reviewer can use the public URL and a clean clone without private help.
+Verification: a new reviewer can use the public URL and a clean clone without private help. Test
+the deployed URL in desktop/mobile browsers, keyboard and accessibility paths, live/fixture/AI
+failure modes, abuse controls, migrations, secret absence, deployment rollback, and the complete
+golden path. Screenshots or a successful deployment command alone do not close Phase 9.
 
 ### Phase 10: optional breadth, only after completion
 
@@ -1339,6 +1574,12 @@ Verification: a new reviewer can use the public URL and a clean clone without pr
 - OpenAPI client generation
 - A deliberately isolated SOAP adapter exercise only if a target job requires it
 - Additional event providers after legal/terms review
+
+Each optional item needs its own measurable reason and acceptance evidence. Do not claim Gemini,
+containers, Kubernetes, Helm, generated clients, SOAP, or another event provider from unused
+interfaces or unexecuted scaffolding. Provider additions must pass the shared contract/evaluation
+suite plus a safe live run; infrastructure additions must install, run, and smoke-test in CI or the
+documented local environment.
 
 ## 23. Free accounts and credentials
 
@@ -1440,6 +1681,10 @@ Recommended defaults are included so implementation does not stall unnecessarily
 3. **Gemini adapter**: recommended Phase 10 resume enhancement, not a launch dependency.
 4. **Kubernetes/Helm**: optional tested local portability profile only after the public product
    is complete.
+5. **Geographic expansion**: current version 1 is New York-only. Boston and Philadelphia have
+   promising Phase 1 data, but supporting them—or broader provider markets—requires explicit scope
+   approval and the multi-city acceptance gate in section 5.4. Do not infer approval from a user
+   asking whether the current product works elsewhere.
 
 ## 28. Decision log
 
@@ -1586,7 +1831,193 @@ state inspection all pass. Keep Stripe-hosted collection and store only provider
 Reason: browser return redirects and owner confirmation alone are not authoritative evidence of
 payment or refund state, and Scout must never imply that its sandbox flow issued an event ticket.
 
+### 2026-08-14 — Bound AI to read-only discovery and preserve account-free local use
+
+Decision: use Workers AI JSON-schema extraction behind the provider-neutral `AIProvider`, then
+validate every field again before deterministic code invokes the sole allowlisted read tool,
+`search_events`. Keep the normal local command free of a Cloudflare requirement and expose the
+remote AI binding only through the explicit AI development environment. Reason: model access
+must never control provider facts, commerce state, confirmation, or the product's ability to
+demonstrate its core journey when quota or account access is unavailable.
+
+### 2026-08-14 — Adopt a Navan-inspired product hierarchy without cloning Navan
+
+Decision: lead with a premium conversational concierge, compact trust signals, modular cards,
+and a clear discover-to-plan journey while retaining Scout's own event identity, live/fixture
+labels, price uncertainty, and sandbox language. Reason: the product should demonstrate the
+high-confidence, low-friction interaction pattern discussed with the owner without copying
+Navan branding or importing unrelated travel and expense claims.
+
+### 2026-08-14 — Complete live Workers AI acceptance on the free tier
+
+Decision: close Phase 6 after live Workers AI structured extraction, read-only tool selection,
+adversarial governance, latency measurement, and a separate no-binding fallback run all passed.
+Keep the remote binding opt-in through `npm run dev:ai`; keep ordinary local development and exact
+filters account-free. Do not deliberately exhaust the shared free quota for testing because the
+same failure boundary is covered through injected provider errors and the live missing-binding
+check. Reason: this supplies real-provider evidence without creating cost or weakening the
+deterministic product path.
+
+### 2026-08-14 — Keep Phase 7 speech channel-neutral and lifecycle records honest
+
+Decision: route transcribed speech back into the existing editable message field and require the
+same explicit submit action instead of creating a voice-specific agent. Use the existing remote
+Workers AI binding for Whisper and MeloTTS, never store raw audio, and fail back to text for every
+speech error. Persist preference corrections, read-only provider status observations, deduplicated
+in-app alerts, and owner-scoped help records; never imply that the help record reaches staffed
+support. Isolate Playwright on port 8790 so it cannot reuse the owner's opt-in AI development
+session. Reason: voice must remain a governed input/output channel, lifecycle facts must remain
+provider-authoritative, and automated acceptance must test the current build deterministically.
+
+### 2026-08-14 — Add a bounded Aura-1 fallback for the live MeloTTS outage
+
+Decision: keep `@cf/myshell-ai/melotts` as the primary TTS model, but after one provider error make
+one attempt with `@cf/deepgram/aura-1` using the same Workers AI binding and then fall back to text.
+Log the model that actually produced audio. Reason: live Phase 7 acceptance repeatedly received
+Cloudflare `AiError 3043: Internal server error` from MeloTTS while Whisper and text inference
+remained healthy. Aura-1 returned a valid no-store MP3 in the same free-tier environment. The
+fallback remains bounded and may not trigger a paid upgrade; Workers Free quota exhaustion still
+fails closed.
+
+### 2026-08-14 — Reopen Phase 3/6 relevance acceptance before advancing
+
+Decision: do not defer exact-time understanding, deterministic time matching, grounded result
+explanations, result diversity, or missing-classification presentation to operations or release
+hardening. Treat them as missed Phase 3/6 product requirements and complete the corrective Phase
+7A gate before closing Phase 7 or beginning Phase 8. Retain the prior evidence for provider
+isolation, read-only AI authority, validation, fallback, and commerce behavior rather than
+discarding unrelated passing work. Reason: the owner's live request for New York shows at 5 PM
+was reduced to a coarse time preference and returned many morning/early-afternoon performances,
+including repeated attraction variants and an `UNDEFINED` label. The earlier acceptance optimized
+for schema validity and safety but did not establish useful semantic fidelity against realistic
+live inventory; calling Phase 6 fully complete was therefore premature.
+
+### 2026-08-14 — Make exact time and explicit relative dates deterministic
+
+Decision: interpret an exact requested start such as 5 PM as a provider-listed local start within
+±30 minutes, keep off-window events in a separately labeled nearest-alternatives list, and never
+infer that an earlier event is still occurring. Resolve explicit `today`, `tomorrow`, and
+`this <weekday>` phrases in deterministic code from the New York date before provider search.
+Group result cards by Ticketmaster attraction ID when present and use normalized title qualifiers
+only as a fallback. Reason: the first corrective live run preserved 17:00 but the model incorrectly
+expanded “this Friday” to 2026-08-19 through 2026-09-10. Provider dates, matching, diversity, and
+response facts must remain server-authoritative rather than model judgments.
+
+### 2026-08-14 — Define paired this/next weekday and weekend semantics
+
+Decision: expand deterministic relative-date resolution beyond the initially tested `this
+<weekday>` case. `This <weekday>` means the nearest occurrence including today; `next <weekday>`
+means seven days after that occurrence. `This weekend` means the upcoming Saturday-Sunday (or the
+remaining Sunday), and `next weekend` means the following weekend. Conflicting relative-date
+phrases require clarification. Show the resolved date/range in the conversation chips. Reason: the
+owner found that “next Friday” still returned the current Friday after the first Phase 7A patch.
+The initial remediation and evaluation corpus were incomplete, and model-provided dates cannot be
+trusted without deterministic phrase coverage.
+
+### 2026-08-14 — Keep geography explicit and harden remaining phase gates
+
+Decision: continue describing the implemented product as New York-only until the owner explicitly
+approves and accepts a multi-city expansion. Keep the hybrid authority model: AI interprets and
+explains, while deterministic code validates geography/time, matches provider facts, and governs
+state-changing actions. Apply the mandatory acceptance discipline in section 21 to Phases 8–10,
+including exact owner regressions, paired/inverse cases, real-provider evidence, and desktop/mobile
+browser verification. Reason: fixture-heavy and schema-focused checks previously missed semantic
+date, exact-time, diversity, and presentation failures. Later phases must not repeat that pattern
+or claim capabilities from unexecuted scaffolding.
+
+### 2026-08-14 — Close Phase 7 and start evidence-first operations work
+
+Decision: close the reopened Phase 3/6 relevance gates and Phase 7/7A after the owner completed
+the interactive `dev:ai` checklist for exact and relative dates, grounded result presentation,
+speech parity and controls, recording fallbacks, and standalone PWA behavior. Retain the controlled
+provider-status regression as lifecycle evidence. Begin Phase 8 with a requirement-to-evidence
+matrix before implementing a protected operations read path. Reason: the owner-only checks now
+complete the existing automated and live-provider evidence, while Phase 8 must preserve the
+hardened acceptance discipline rather than start with an unverified fixture dashboard.
+
+### 2026-08-14 — Finish Phase 8 implementation without claiming undeployed evidence
+
+Decision: accept the protected D1 operations implementation, automated corpus, responsive browser
+surface, real provider request, safe local Worker logs, and direct D1 comparison as passing Phase 8
+implementation evidence. Configure Cloudflare persisted logs and traces, but leave Phase 8
+acceptance pending until an authorized preview environment with a real remote D1 binding records
+one safe correlated trace/log set. Do not create remote resources, store a new secret, or publish a
+Worker implicitly, and do not begin Phase 9 while this gate remains. Reason: the handoff explicitly
+requires deployed Cloudflare evidence, while the current `local-development` database binding
+cannot support a truthful preview deployment and remote environment creation is a consequential
+external action.
+
+### 2026-08-14 — Deploy Phase 8 preview and minimize persisted request data
+
+Decision: create the dedicated `scout-preview` D1 database and Worker only after owner
+authorization, apply all migrations, store operator/provider values as Cloudflare secrets, and
+verify healthy, deliberately degraded, and recovered Ticketmaster correlations against the
+protected API, direct remote D1, and Cloudflare-native logs. Disable automatic invocation-log
+persistence after the native tail demonstrated that its raw envelope contains request headers;
+retain allowlisted application logs and full-sampled traces for the initial low-traffic preview.
+Keep Phase 8 acceptance pending only until an account owner or Workers Observability-read API token
+can inspect the persisted trace contents. Reason: the deployment evidence now exists, but Scout
+must not retain operator cookies merely to make observability more convenient or claim an
+uninspected trace as safe.
+
+### 2026-08-14 — Close Phase 8 after owner trace inspection
+
+Decision: close Phase 8 after the owner inspected the persisted Cloudflare trace and supplied
+screenshots showing the expected GET, Ticketmaster, and D1 spans plus only the two allowlisted
+application log messages for `phase8-preview-final-log-20260814`. Accept the screenshots together
+with the already matched protected API, remote D1, native tail, and automated corpus as the final
+observability evidence. Reason: the dashboard view confirms the deployed trace is useful for
+diagnosis without exposing credentials, cookies, prompts, transcripts, raw audio, or payment data.
+
+### 2026-08-14 — Begin Phase 9 with deployed baselines and release gates
+
+Decision: start Phase 9 with `docs/RELEASE_ACCEPTANCE.md`, a paired requirement-to-evidence matrix,
+and read-only checks against the existing preview before creating or changing production
+resources. The first baseline found missing app-defined security headers and a missing keyboard
+skip link, so the initial local hardening slice adds both plus an explicit-URL desktop/mobile
+deployment smoke suite. The owner authorized preview promotion; Worker version
+`6102dfea-8350-41ee-aef8-e8b15731bddd` passed all four deployed desktop/mobile smoke checks, and
+direct edge inspection confirmed the intended static/API security policies. Keep Phase 9 in
+progress until the remaining manual-accessibility, abuse, environment, rollback, clean-clone, and
+golden-path gates pass and the public release is reproducible without private help. Reason: the
+hardened phase protocol requires failing deployed evidence before implementation and forbids
+treating a passing preview slice as the completed public release.
+
+### 2026-08-14 — Add an authoritative release limiter and isolate production data
+
+Decision: keep Cloudflare's rate-limit binding as the fast edge layer, but enforce the release
+threshold with an atomic D1 minute window keyed by a SHA-256 actor digest. A live preview burst
+showed that the edge binding alone can admit a bounded distributed burst because it is eventually
+consistent; after migration `0007`, the same acceptance test allowed requests 1–10 and rejected
+request 11 with HTTP 429 and `Retry-After: 60`. Use server-owned guest identity for public work,
+separate scopes for costly, mutation, and operator-authentication routes, same-origin enforcement
+for mutations, and request-size caps before provider work. Reason: the public release needs a
+deterministic ceiling across isolates without persisting raw session or IP values.
+
+Create the empty `scout-production` D1 separately from `scout-preview` and apply migrations only;
+do not copy preview guest, operator, payment, or telemetry data. Production credential
+provisioning and the Stripe test webhook remain pending explicit approval to transfer the local
+credentials into the Cloudflare production secret store and create the external Stripe endpoint.
+Phase 9 therefore remains in progress.
+
 ## 29. Immediate next action for a new Codex session
 
-Phase 5 is verified complete. Phase 6 AI orchestration is next; follow its implementation and
-acceptance criteria above before beginning Phase 7.
+Continue Phase 9 production hardening and public release. The release matrix and current evidence
+are in `docs/RELEASE_ACCEPTANCE.md`. Preview version
+`9a4240cb-e9e2-4577-aee4-fc1a9bd47c53` serves the security headers, skip path, and authoritative
+D1-backed abuse controls; its deployed release suite passes 4/4 and its live threshold test passes.
+Production D1 exists separately with migrations through `0007` and no copied preview data.
+Preserve the Phase 8 privacy-hardened observability settings and keep production isolated.
+
+The current product is New York-only. Do not broaden the next task to Boston or arbitrary markets
+unless the owner explicitly chooses geographic expansion; if approved, use the separate multi-city
+gate in section 5.4 before making broader claims.
+
+1. Obtain explicit approval to store the local Ticketmaster, Stripe, and operator credentials in
+   Cloudflare's production secret store and create the Stripe test-mode production webhook.
+2. Deploy production, then complete production desktop/mobile, accessibility, provider, voice,
+   Stripe, lifecycle, protected-operations, and isolation evidence.
+3. Perform and smoke-test a Worker version rollback, then restore the accepted release.
+4. Verify a clean source copy with `npm ci`, migrations, quality gates, and browser tests.
+5. Capture final production screenshots, audit release claims, close
+   `docs/RELEASE_ACCEPTANCE.md`, and only then commit and publish the release branch.

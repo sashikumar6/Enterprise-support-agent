@@ -5,7 +5,7 @@ import type {
   EventSearchResult,
 } from "./events";
 import { EventProviderError } from "./provider-error";
-import { rankEvents } from "./ranking";
+import { rankEventResults } from "./ranking";
 
 export class DiscoveryService {
   constructor(
@@ -19,24 +19,27 @@ export class DiscoveryService {
   ): Promise<EventSearchResult> {
     if (requestedMode === "fixture" || !this.liveProvider) {
       const result = await this.fixtureProvider.search(constraints);
+      const ranked = rankEventResults(result.events, constraints);
       return {
         ...result,
         requestedMode,
-        events: rankEvents(result.events, constraints),
+        ...ranked,
         fallbackReason: requestedMode === "live" ? "missing_key" : null,
       };
     }
 
     try {
       const result = await this.liveProvider.search(constraints);
+      const ranked = rankEventResults(result.events, constraints);
       return {
         ...result,
         requestedMode,
-        events: rankEvents(result.events, constraints),
+        ...ranked,
         fallbackReason: null,
       };
     } catch (error) {
       const result = await this.fixtureProvider.search(constraints);
+      const ranked = rankEventResults(result.events, constraints);
       const fallbackReason =
         error instanceof EventProviderError
           ? {
@@ -49,7 +52,7 @@ export class DiscoveryService {
       return {
         ...result,
         requestedMode,
-        events: rankEvents(result.events, constraints),
+        ...ranked,
         fallbackReason,
       };
     }

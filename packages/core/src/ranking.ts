@@ -4,6 +4,7 @@ import type {
   EventSummary,
   RankedEvent,
 } from "./events";
+import { EXACT_START_WINDOW_MINUTES } from "./events";
 
 const blockedStatuses = new Set([
   "cancelled",
@@ -66,6 +67,18 @@ function rankOne(
     }
   }
 
+  if (
+    constraints.exactStartTime &&
+    event.localTime &&
+    timeDistance(event, constraints.exactStartTime) <=
+      EXACT_START_WINDOW_MINUTES
+  ) {
+    score += 15;
+    scoreReasons.push(
+      `Starts within ${EXACT_START_WINDOW_MINUTES} minutes of your exact time`,
+    );
+  }
+
   if (constraints.budgetMax !== null) {
     if (event.price && event.price.minimum <= constraints.budgetMax) {
       score += 20;
@@ -90,12 +103,11 @@ function rankOne(
   return { ...event, score, scoreReasons };
 }
 
-export function rankEvents(
+function eligibleEvents(
   events: EventSummary[],
   constraints: EventSearchConstraints,
-  limit = 12,
-): RankedEvent[] {
-  const filtered = events.filter((event) => {
+) {
+  return events.filter((event) => {
     const status = event.status?.toLocaleLowerCase();
     return (
       event.venue.city?.toLocaleLowerCase() ===
@@ -109,8 +121,46 @@ export function rankEvents(
         event.price.minimum <= constraints.budgetMax)
     );
   });
+}
 
-  const ranked = filtered.map((event) => rankOne(event, constraints));
+function minutes(value: string) {
+  const [hours, minutes] = value.split(":").map(Number);
+  return hours * 60 + minutes;
+}
+
+function timeDistance(event: EventSummary, exactStartTime: string) {
+  return event.localTime
+    ? Math.abs(minutes(event.localTime) - minutes(exactStartTime))
+    : Number.POSITIVE_INFINITY;
+}
+
+function attractionGroup(event: EventSummary) {
+  if (event.attractionId) return `${event.source}:${event.attractionId}`;
+  return event.name
+    .normalize("NFKD")
+    .toLocaleLowerCase()
+    .split(/\s+(?:—|–|-)\s+|[([]/, 1)[0]
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function diversify(
+  ranked: RankedEvent[],
+  limit: number,
+  excludedGroups = new Set<string>(),
+) {
+  const seen = new Set(excludedGroups);
+  return ranked
+    .filter((event) => {
+      const key = attractionGroup(event) || event.id.toLocaleLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, limit);
+}
+
+function sortRanked(ranked: RankedEvent[]) {
   ranked.sort(
     (left, right) =>
       right.score - left.score ||
@@ -118,15 +168,59 @@ export function rankEvents(
       (left.localTime ?? "99:99").localeCompare(right.localTime ?? "99:99") ||
       left.id.localeCompare(right.id),
   );
+  return ranked;
+}
 
-  const seen = new Set<string>();
-  return ranked
-    .filter((event) => {
-      const key =
-        `${event.name}|${event.localDate}|${event.localTime}|${event.venue.name}`.toLocaleLowerCase();
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    })
-    .slice(0, limit);
+export function rankEventResults(
+  events: EventSummary[],
+  constraints: EventSearchConstraints,
+  limit = 12,
+): { events: RankedEvent[]; alternatives: RankedEvent[] } {
+  const filtered = eligibleEvents(events, constraints);
+  if (!constraints.exactStartTime) {
+    return {
+      events: diversify(
+        sortRanked(filtered.map((event) => rankOne(event, constraints))),
+        limit,
+      ),
+      alternatives: [],
+    };
+  }
+
+  const exact = filtered.filter(
+    (event) =>
+      timeDistance(event, constraints.exactStartTime!) <=
+      EXACT_START_WINDOW_MINUTES,
+  );
+  const offWindow = filtered.filter(
+    (event) =>
+      event.localTime !== null &&
+      timeDistance(event, constraints.exactStartTime!) >
+        EXACT_START_WINDOW_MINUTES,
+  );
+  const matches = diversify(
+    sortRanked(exact.map((event) => rankOne(event, constraints))),
+    limit,
+  );
+  const matchGroups = new Set(matches.map((event) => attractionGroup(event)));
+  const alternatives = offWindow.map((event) => rankOne(event, constraints));
+  alternatives.sort(
+    (left, right) =>
+      timeDistance(left, constraints.exactStartTime!) -
+        timeDistance(right, constraints.exactStartTime!) ||
+      right.score - left.score ||
+      left.id.localeCompare(right.id),
+  );
+  return {
+    events: matches,
+    alternatives: diversify(alternatives, 3, matchGroups),
+  };
+}
+
+export function rankEvents(
+  events: EventSummary[],
+  constraints: EventSearchConstraints,
+  limit = 12,
+): RankedEvent[] {
+  return rankEventResults(events, constraints, limit).events;
 }

@@ -18,6 +18,7 @@ const constraints: EventSearchConstraints = {
   budgetMax: 100,
   partySize: 2,
   timePreference: "evening",
+  exactStartTime: null,
 };
 
 function event(overrides: Partial<EventSummary> = {}): EventSummary {
@@ -25,6 +26,7 @@ function event(overrides: Partial<EventSummary> = {}): EventSummary {
     id: "event-1",
     source: "ticketmaster",
     name: "Jazz Night",
+    attractionId: null,
     startsAt: "2026-08-15T23:30:00Z",
     localDate: "2026-08-15",
     localTime: "19:30:00",
@@ -59,6 +61,33 @@ describe("search constraint validation", () => {
       constraints: { city: "New York", budgetMax: 120 },
       mode: "live",
     });
+  });
+
+  it("retains a validated exact local start time without reducing it to a coarse preference", () => {
+    expect(
+      normalizeSearchInput(
+        {
+          startDate: "2026-08-14",
+          endDate: "2026-08-14",
+          timePreference: "any",
+          exactStartTime: "17:00",
+        },
+        new Date("2026-08-13T16:00:00Z"),
+      ),
+    ).toMatchObject({
+      constraints: { exactStartTime: "17:00", timePreference: "any" },
+    });
+
+    expect(() =>
+      normalizeSearchInput(
+        {
+          startDate: "2026-08-14",
+          endDate: "2026-08-14",
+          exactStartTime: "5 PM",
+        },
+        new Date("2026-08-13T16:00:00Z"),
+      ),
+    ).toThrow(SearchValidationError);
   });
 
   it("rejects unsupported cities, past dates, and ranges over 30 days", () => {
@@ -100,6 +129,68 @@ describe("deterministic ranking", () => {
       "Provider minimum is within budget",
     );
     expect(results[1].scoreReasons).toContain("Provider price is not supplied");
+  });
+
+  it("separates exact-time matches from nearest alternatives using a 30-minute window", async () => {
+    const provider = {
+      search: async () => ({
+        mode: "live" as const,
+        observedAt: "2026-08-13T12:00:00Z",
+        events: [
+          event({ id: "exact", localTime: "17:30:00" }),
+          event({ id: "nearest", name: "Nearby Show", localTime: "16:15:00" }),
+          event({ id: "later", name: "Late Show", localTime: "19:00:00" }),
+        ],
+      }),
+    };
+    const result = await new DiscoveryService(provider, provider).search(
+      { ...constraints, exactStartTime: "17:00", timePreference: "any" },
+      "live",
+    );
+
+    expect(result.events.map((item) => item.id)).toEqual(["exact"]);
+    expect(result.alternatives.map((item) => item.id)).toEqual([
+      "nearest",
+      "later",
+    ]);
+  });
+
+  it("diversifies minor title variants while retaining distinct attractions", () => {
+    const results = rankEvents(
+      [
+        event({ id: "first", name: "Blue Man Group" }),
+        event({
+          id: "second",
+          name: "Blue Man Group — Matinee",
+          localTime: "20:00:00",
+        }),
+        event({ id: "third", name: "The Lion King" }),
+      ],
+      constraints,
+    );
+
+    expect(results.map((item) => item.id)).toEqual(["first", "third"]);
+  });
+
+  it("prefers provider attraction identity when performance titles differ", () => {
+    const results = rankEvents(
+      [
+        event({
+          id: "museum-flex",
+          name: "Banksy Museum - Flexiticket",
+          attractionId: "banksy-museum",
+        }),
+        event({
+          id: "museum-standard",
+          name: "The Banksy Museum New York!",
+          attractionId: "banksy-museum",
+          localTime: "20:00:00",
+        }),
+      ],
+      constraints,
+    );
+
+    expect(results).toHaveLength(1);
   });
 });
 

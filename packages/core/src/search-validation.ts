@@ -6,6 +6,7 @@ import type {
 } from "./events";
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
 const categories = new Set<EventCategory>([
   "all",
   "music",
@@ -24,6 +25,7 @@ export interface EventSearchInput {
   budgetMax?: string;
   partySize?: string;
   timePreference?: string;
+  exactStartTime?: string;
   mode?: string;
 }
 
@@ -95,6 +97,11 @@ export function normalizeSearchInput(
     issues.push("timePreference is not supported");
   }
 
+  const exactStartTime = input.exactStartTime?.trim() || null;
+  if (exactStartTime !== null && !TIME_PATTERN.test(exactStartTime)) {
+    issues.push("exactStartTime must use 24-hour HH:mm format");
+  }
+
   const partySize = Number(input.partySize || "2");
   if (!Number.isInteger(partySize) || partySize < 1 || partySize > 12) {
     issues.push("partySize must be an integer from 1 to 12");
@@ -126,6 +133,7 @@ export function normalizeSearchInput(
       budgetMax,
       partySize,
       timePreference,
+      exactStartTime,
     },
     mode,
   };

@@ -5,13 +5,13 @@ export default defineConfig({
   fullyParallel: true,
   reporter: "list",
   use: {
-    baseURL: "http://127.0.0.1:8787",
+    baseURL: "http://127.0.0.1:8790",
     trace: "retain-on-failure",
   },
   webServer: {
-    command: "npm run test:e2e:serve",
-    url: "http://127.0.0.1:8787/api/v1/health",
-    reuseExistingServer: !process.env.CI,
+    command: "npm run test:e2e:serve:isolated",
+    url: "http://127.0.0.1:8790/api/v1/health",
+    reuseExistingServer: false,
   },
   projects: [
     { name: "desktop-chromium", use: { ...devices["Desktop Chrome"] } },

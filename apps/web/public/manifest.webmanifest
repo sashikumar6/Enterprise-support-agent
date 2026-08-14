@@ -1,0 +1,17 @@
+{
+  "name": "Scout Events Concierge",
+  "short_name": "Scout",
+  "description": "A governed AI concierge for live New York event discovery and demo plans.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f6fb",
+  "theme_color": "#0c1538",
+  "icons": [
+    {
+      "src": "/scout-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

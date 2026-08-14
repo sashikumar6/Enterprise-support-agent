@@ -15,6 +15,7 @@ const constraints: EventSearchConstraints = {
   budgetMax: 100,
   partySize: 2,
   timePreference: "evening",
+  exactStartTime: null,
 };
 
 const rawEvent = {
@@ -53,6 +54,7 @@ const rawEvent = {
     },
   ],
   _embedded: {
+    attractions: [{ id: "attraction-jazz" }],
     venues: [
       {
         name: "Blue Note Jazz Club",
@@ -70,10 +72,30 @@ describe("TicketmasterEventProvider", () => {
     ).toMatchObject({
       id: "tm-1",
       source: "ticketmaster",
+      attractionId: "attraction-jazz",
       localDate: "2026-08-14",
       venue: { name: "Blue Note Jazz Club", city: "New York" },
       price: { minimum: 38.1, maximum: 54.99, currency: "USD" },
       image: { url: "https://example.com/wide.jpg" },
+    });
+  });
+
+  it("maps placeholder classifications to missing provider facts", () => {
+    expect(
+      normalizeTicketmasterEvent(
+        {
+          ...rawEvent,
+          classifications: [
+            {
+              segment: { name: "Undefined" },
+              genre: { name: "null" },
+            },
+          ],
+        },
+        "2026-08-13T12:00:00Z",
+      ),
+    ).toMatchObject({
+      classification: { segment: null, genre: null, subGenre: null },
     });
   });
 
