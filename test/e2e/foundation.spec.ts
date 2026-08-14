@@ -26,6 +26,18 @@ test("searches fixtures and inspects a clearly labeled event", async ({
     page.getByText("Demo event only; this is not real inventory."),
   ).toBeVisible();
 
+  await page.getByRole("button", { name: "Save as draft" }).click();
+  await expect(page.getByRole("heading", { name: "My Plans" })).toBeVisible();
+  await expect(page.getByText("Draft · no payment")).toBeVisible();
+  await expect(
+    page.getByText("A draft is not a reservation, ticket, or purchase."),
+  ).toBeVisible();
+  await page.reload();
+  await expect(page.getByText("Draft · no payment")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Friday Night Comedy — Demo Event" }),
+  ).toHaveCount(1);
+
   const health = await request.get("/api/v1/health");
   expect(health.ok()).toBeTruthy();
   await expect(health.json()).resolves.toMatchObject({

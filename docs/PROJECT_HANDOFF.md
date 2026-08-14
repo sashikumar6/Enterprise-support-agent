@@ -1,6 +1,6 @@
 # Scout project handoff
 
-Status: Phase 3 complete; Phase 4 durable plans and commerce state is next
+Status: Phase 4 complete; Phase 5 Stripe sandbox is next
 Last updated: 2026-08-13  
 Working name: **Scout** (provisional; perform a naming/trademark check before public launch)
 
@@ -1211,7 +1211,7 @@ source and freshness labels, optional prices, score reasons, expandable details,
 links. Unit/API/provider tests, a real bounded Ticketmaster request, and desktop/mobile browser
 journeys passed. The source contract and checks are recorded in `docs/DISCOVERY_ACCEPTANCE.md`.
 
-### Phase 4: durable plan and commerce state machine
+### Phase 4: durable plan and commerce state machine — complete 2026-08-13
 
 Outcome: selected events create durable drafts and safe transitions.
 
@@ -1222,6 +1222,18 @@ Outcome: selected events create durable drafts and safe transitions.
 - My Plans UI
 
 Verification: transition tests include invalid, repeated, and concurrent-looking operations.
+
+Result: **COMPLETE**. Scout now issues opaque HttpOnly guest-session cookies and stores only
+their hashes in D1. A selected normalized event can be saved through the versioned plans API
+as a guest-owned draft whose immutable snapshot preserves provider facts, freshness, price
+uncertainty, and ranking evidence. Draft creation atomically writes the snapshot, reservation,
+initial transition, and correlated audit event; owner/idempotency-key replays return the
+existing draft. The migration also establishes constrained checkout and payment-event records
+for Phase 5 without creating payment behavior early. Pure checkout and reservation state
+machines reject invalid edges and stale versions while treating known operation IDs as safe
+replays. My Plans persists across reloads and clearly states that drafts are not reservations,
+tickets, or purchases. Unit/API tests, local D1 migration, production builds, and desktop/mobile
+browser journeys passed. The contract and evidence are recorded in `docs/PLANS_ACCEPTANCE.md`.
 
 ### Phase 5: Stripe sandbox
 
@@ -1526,20 +1538,31 @@ return clearly labeled fixtures with a machine-readable reason instead of making
 journey unusable. Reason: this proves the provider seam and honest recommendation behavior
 before Phase 4 introduces users, saved plans, or transaction state.
 
+### 2026-08-13 — Complete durable guest plans before Stripe
+
+Decision: represent a saved plan as a guest-owned reservation aggregate in `draft` state,
+backed by an immutable normalized event snapshot. Use a server-issued opaque HttpOnly cookie
+for guest continuity, persist only its SHA-256 hash, batch the initial transition and audit
+record with draft creation, and make owner/idempotency-key retries replay-safe. Model the
+future checkout/payment records and state transitions now, but expose no payment transition
+endpoint until verified Stripe test-mode webhooks exist. Reason: this completes an honest,
+durable selection journey while preserving a safe boundary between user intent and commerce.
+
 ## 29. Immediate next action for a new Codex session
 
-Phase 3 is complete. Do not add Stripe, AI orchestration, voice, or operations surfaces yet.
-Begin Phase 4 with durable plan and commerce-state modeling behind the existing discovery UI.
+Phase 4 is complete. Do not add AI orchestration, voice, or operations surfaces yet. Begin
+Phase 5 by guiding the owner through just-in-time Stripe test-mode account setup; never ask
+them to paste a secret into chat.
 
-1. Read this handoff completely and inspect the current domain/API/UI contracts without
-   changing the provider-backed discovery behavior.
-2. Define users/guest sessions, saved-plan drafts, event snapshots, checkout, payment,
-   reservation, transition, and audit records with the minimum D1 migrations required by the
-   Phase 4 journeys.
-3. Write state-machine tests first for valid transitions, invalid transitions, replay-safe
-   behavior, ownership, and concurrent-looking version conflicts.
-4. Add guest session ownership and repository contracts, keeping D1 outside the domain model.
-5. Let a user select a normalized event into a durable draft and inspect it in My Plans. Store
-   the observed event snapshot rather than silently refreshing historical decision facts.
-6. Verify local migrations, persistence integration, transition behavior, and a browser journey.
-   Do not create Stripe checkout or imply any reservation is a real Ticketmaster booking yet.
+1. Read this handoff and `docs/PLANS_ACCEPTANCE.md` completely, then inspect the existing
+   reservation/checkout state contracts and D1 schema.
+2. Explain the required Stripe test-mode account, secret, and webhook setup step by step. Keep
+   secrets in ignored local configuration and Cloudflare secret storage only.
+3. Add a `PaymentProvider` port and Stripe test adapter without importing Stripe SDK concerns
+   into the domain.
+4. Create checkout only after an explicit user confirmation and retain the visible sandbox,
+   no-real-ticket notice.
+5. Advance payment and reservation state only from a signature-verified webhook using atomic
+   version predicates and replay-safe provider event IDs.
+6. Cover success, failure, expiry, duplicate/out-of-order webhook, cancellation, refund, and
+   persistent demo-receipt behavior with unit, integration, and browser tests.

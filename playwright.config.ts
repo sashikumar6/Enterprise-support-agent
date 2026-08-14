@@ -9,7 +9,7 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   webServer: {
-    command: "npm run dev",
+    command: "npm run test:e2e:serve",
     url: "http://127.0.0.1:8787/api/v1/health",
     reuseExistingServer: !process.env.CI,
   },

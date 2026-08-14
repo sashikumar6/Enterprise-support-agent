@@ -18,6 +18,7 @@
     "spike:ticketmaster": "node scripts/ticketmaster-spike.mjs",
     "test": "npm run test:spike && npm run test:unit",
     "test:e2e": "playwright test",
+    "test:e2e:serve": "npm run migrate:local && npm run dev",
     "test:spike": "node --test test/ticketmaster-analysis.test.mjs",
     "test:unit": "vitest run",
     "typecheck": "tsc --build --pretty false"

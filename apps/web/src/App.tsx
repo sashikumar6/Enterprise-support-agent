@@ -2,8 +2,15 @@ import type {
   EventSearchConstraints,
   EventSearchResult,
   RankedEvent,
+  SavedPlan,
 } from "@scout/core";
-import { useEffect, useState, type FormEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 
 type ServiceState = "checking" | "online" | "unavailable";
 type SearchState = "idle" | "loading" | "success" | "error";
@@ -16,6 +23,11 @@ interface SearchResponse {
 
 interface ErrorResponse {
   error?: { message?: string; issues?: string[] };
+}
+
+interface PlansResponse {
+  data: SavedPlan[];
+  requestId: string;
 }
 
 function dateValue(daysFromToday: number) {
@@ -76,6 +88,25 @@ export function App() {
   const [result, setResult] = useState<SearchResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sessionId] = useState(() => crypto.randomUUID());
+  const [plans, setPlans] = useState<SavedPlan[]>([]);
+  const [plansLoading, setPlansLoading] = useState(true);
+  const [plansError, setPlansError] = useState<string | null>(null);
+  const [savingEvent, setSavingEvent] = useState<string | null>(null);
+  const [reviewingPlan, setReviewingPlan] = useState<string | null>(null);
+  const [commerceBusy, setCommerceBusy] = useState<string | null>(null);
+  const [commerceNotice, setCommerceNotice] = useState<string | null>(() => {
+    const state = new URLSearchParams(window.location.search).get("checkout");
+    if (state === "return") {
+      return "Stripe returned to Scout. Waiting for the verified webhook before confirming the demo reservation.";
+    }
+    if (state === "cancelled") {
+      return "Sandbox checkout was closed. No reservation or charge was confirmed.";
+    }
+    return null;
+  });
+  const saveKeys = useRef(new Map<string, string>());
+  const checkoutKeys = useRef(new Map<string, string>());
+  const cancellationKeys = useRef(new Map<string, string>());
 
   useEffect(() => {
     const controller = new AbortController();
@@ -90,6 +121,57 @@ export function App() {
       });
     return () => controller.abort();
   }, []);
+
+  const loadPlans = useCallback(async (signal?: AbortSignal) => {
+    const response = await fetch("/api/v1/plans", { signal });
+    if (!response.ok) throw new Error("Saved plans are unavailable.");
+    const payload = (await response.json()) as PlansResponse;
+    setPlans(payload.data);
+    return payload.data;
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void loadPlans(controller.signal)
+      .catch((caught: unknown) => {
+        if (!(caught instanceof DOMException && caught.name === "AbortError")) {
+          setPlansError(
+            caught instanceof Error
+              ? caught.message
+              : "Saved plans are unavailable.",
+          );
+        }
+      })
+      .finally(() => setPlansLoading(false));
+    return () => controller.abort();
+  }, [loadPlans]);
+
+  useEffect(() => {
+    if (
+      new URLSearchParams(window.location.search).get("checkout") !== "return"
+    )
+      return;
+    let attempts = 0;
+    const timer = window.setInterval(() => {
+      attempts += 1;
+      void loadPlans()
+        .then((current) => {
+          if (current.some((plan) => plan.state === "confirmed")) {
+            setCommerceNotice(
+              "Verified Stripe webhook received. Your demo reservation is confirmed.",
+            );
+            window.clearInterval(timer);
+          } else if (attempts >= 15) {
+            setCommerceNotice(
+              "Payment verification is still pending. Your plan will update only after Scout receives a verified Stripe webhook.",
+            );
+            window.clearInterval(timer);
+          }
+        })
+        .catch(() => window.clearInterval(timer));
+    }, 1_000);
+    return () => window.clearInterval(timer);
+  }, [loadPlans]);
 
   async function submitSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -125,6 +207,121 @@ export function App() {
     }
   }
 
+  async function savePlan(event: RankedEvent) {
+    const eventKey = `${event.source}:${event.id}`;
+    setSavingEvent(eventKey);
+    setPlansError(null);
+    let idempotencyKey = saveKeys.current.get(eventKey);
+    if (!idempotencyKey) {
+      idempotencyKey = crypto.randomUUID();
+      saveKeys.current.set(eventKey, idempotencyKey);
+    }
+
+    try {
+      const response = await fetch("/api/v1/plans", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ event, idempotencyKey }),
+      });
+      const payload = (await response.json()) as {
+        data?: SavedPlan;
+      } & ErrorResponse;
+      if (!response.ok || !payload.data) {
+        throw new Error(
+          payload.error?.message || "This plan could not be saved.",
+        );
+      }
+      setPlans((current) => {
+        const withoutReplay = current.filter(
+          (plan) => plan.id !== payload.data?.id,
+        );
+        return [payload.data as SavedPlan, ...withoutReplay];
+      });
+      document.querySelector("#plans")?.scrollIntoView({ behavior: "smooth" });
+    } catch (caught) {
+      setPlansError(
+        caught instanceof Error
+          ? caught.message
+          : "This plan could not be saved.",
+      );
+    } finally {
+      setSavingEvent(null);
+    }
+  }
+
+  async function beginCheckout(plan: SavedPlan) {
+    setCommerceBusy(plan.id);
+    setPlansError(null);
+    let idempotencyKey = checkoutKeys.current.get(plan.id);
+    if (!idempotencyKey) {
+      idempotencyKey = crypto.randomUUID();
+      checkoutKeys.current.set(plan.id, idempotencyKey);
+    }
+    try {
+      const response = await fetch("/api/v1/checkouts", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          reservationId: plan.id,
+          idempotencyKey,
+          confirmed: true,
+        }),
+      });
+      const payload = (await response.json()) as {
+        data?: { redirectUrl?: string };
+      } & ErrorResponse;
+      if (!response.ok || !payload.data?.redirectUrl) {
+        throw new Error(
+          payload.error?.message || "Sandbox checkout could not be started.",
+        );
+      }
+      window.location.assign(payload.data.redirectUrl);
+    } catch (caught) {
+      setPlansError(
+        caught instanceof Error
+          ? caught.message
+          : "Sandbox checkout could not be started.",
+      );
+      setCommerceBusy(null);
+    }
+  }
+
+  async function cancelReservation(plan: SavedPlan) {
+    setCommerceBusy(plan.id);
+    setPlansError(null);
+    let idempotencyKey = cancellationKeys.current.get(plan.id);
+    if (!idempotencyKey) {
+      idempotencyKey = crypto.randomUUID();
+      cancellationKeys.current.set(plan.id, idempotencyKey);
+    }
+    try {
+      const response = await fetch(`/api/v1/reservations/${plan.id}/cancel`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ confirmed: true, idempotencyKey }),
+      });
+      const payload = (await response.json()) as ErrorResponse;
+      if (!response.ok) {
+        throw new Error(
+          payload.error?.message || "Cancellation could not be started.",
+        );
+      }
+      await loadPlans();
+      setReviewingPlan(null);
+      setCommerceNotice(
+        "Sandbox cancellation requested. Scout will mark it cancelled only after the verified refund webhook arrives.",
+      );
+    } catch (caught) {
+      setPlansError(
+        caught instanceof Error
+          ? caught.message
+          : "Cancellation could not be started.",
+      );
+    } finally {
+      setCommerceBusy(null);
+    }
+  }
+
   const fallback = result ? fallbackMessage(result.data) : null;
 
   return (
@@ -136,11 +333,14 @@ export function App() {
           </span>
           Scout
         </a>
-        <div className="service-status" role="status" aria-live="polite">
-          <span className={`status-dot status-dot--${serviceState}`} />
-          {serviceState === "checking" && "Checking system"}
-          {serviceState === "online" && "System online"}
-          {serviceState === "unavailable" && "System unavailable"}
+        <div className="topbar-actions">
+          <a href="#plans">My Plans ({plans.length})</a>
+          <div className="service-status" role="status" aria-live="polite">
+            <span className={`status-dot status-dot--${serviceState}`} />
+            {serviceState === "checking" && "Checking system"}
+            {serviceState === "online" && "System online"}
+            {serviceState === "unavailable" && "System unavailable"}
+          </div>
         </div>
       </header>
 
@@ -297,7 +497,17 @@ export function App() {
               ) : (
                 <div className="event-grid">
                   {result.data.events.map((item) => (
-                    <EventCard key={`${item.source}:${item.id}`} event={item} />
+                    <EventCard
+                      key={`${item.source}:${item.id}`}
+                      event={item}
+                      onSave={savePlan}
+                      saving={savingEvent === `${item.source}:${item.id}`}
+                      saved={plans.some(
+                        (plan) =>
+                          plan.event.source === item.source &&
+                          plan.event.id === item.id,
+                      )}
+                    />
                   ))}
                 </div>
               )}
@@ -306,6 +516,163 @@ export function App() {
                 Request {result.requestId}
               </p>
             </>
+          )}
+        </section>
+
+        <section id="plans" className="plans" aria-labelledby="plans-title">
+          <div className="results-heading">
+            <div>
+              <p className="step-label">Durable drafts</p>
+              <h2 id="plans-title">My Plans</h2>
+            </div>
+            <span className="source-pill source-pill--fixture">Demo only</span>
+          </div>
+          <p className="plans-intro">
+            Saved events are private to this guest browser session. Stripe runs
+            in test mode; Scout never creates a real charge or event ticket.
+          </p>
+          {commerceNotice && (
+            <div className="notice" role="status">
+              {commerceNotice}
+            </div>
+          )}
+          {plansError && (
+            <div className="state-card state-card--error" role="alert">
+              <strong>My Plans needs attention.</strong>
+              <p>{plansError}</p>
+            </div>
+          )}
+          {plansLoading ? (
+            <div className="state-card">Loading saved plans…</div>
+          ) : plans.length === 0 ? (
+            <div className="state-card">
+              <strong>No saved plans yet.</strong>
+              <p>
+                Search above and save an event to keep its observed details.
+              </p>
+            </div>
+          ) : (
+            <div className="plan-list">
+              {plans.map((plan) => (
+                <article className="plan-card" key={plan.id}>
+                  <div>
+                    <span className="plan-state">{planStateLabel(plan)}</span>
+                    <h3>{plan.event.name}</h3>
+                    <p>{formatEventDate(plan.event)}</p>
+                    <p>
+                      {plan.event.venue.name || "Venue not supplied"} ·{" "}
+                      {formatPrice(plan.event)}
+                    </p>
+                    {plan.state === "confirmed" && plan.checkout && (
+                      <div className="demo-receipt">
+                        <strong>Demo receipt</strong>
+                        <span>
+                          ${(plan.checkout.amountMinor / 100).toFixed(2)}{" "}
+                          {plan.checkout.currency.toUpperCase()} test payment
+                        </span>
+                        <span>Receipt {plan.checkout.id}</span>
+                        <span>
+                          Confirmed{" "}
+                          {plan.checkout.completedAt
+                            ? new Date(
+                                plan.checkout.completedAt,
+                              ).toLocaleString()
+                            : "by verified webhook"}
+                        </span>
+                        <em>No Ticketmaster ticket was issued.</em>
+                      </div>
+                    )}
+                    {reviewingPlan === plan.id && plan.state === "draft" && (
+                      <div className="confirmation-card" role="group">
+                        <strong>Confirm sandbox checkout</strong>
+                        <p>
+                          Stripe will simulate a $1.00 USD payment. This amount
+                          is unrelated to the provider price and creates no real
+                          charge, reservation, or ticket.
+                        </p>
+                        <div>
+                          <button
+                            type="button"
+                            className="secondary-button"
+                            onClick={() => setReviewingPlan(null)}
+                          >
+                            Go back
+                          </button>
+                          <button
+                            type="button"
+                            className="commerce-button"
+                            disabled={commerceBusy === plan.id}
+                            onClick={() => void beginCheckout(plan)}
+                          >
+                            {commerceBusy === plan.id
+                              ? "Starting…"
+                              : "Confirm and continue to Stripe"}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    {reviewingPlan === plan.id &&
+                      plan.state === "confirmed" && (
+                        <div className="confirmation-card" role="group">
+                          <strong>Confirm demo cancellation</strong>
+                          <p>
+                            This requests a refund of the $1.00 Stripe test
+                            payment. It does not cancel a provider ticket.
+                          </p>
+                          <div>
+                            <button
+                              type="button"
+                              className="secondary-button"
+                              onClick={() => setReviewingPlan(null)}
+                            >
+                              Keep plan
+                            </button>
+                            <button
+                              type="button"
+                              className="commerce-button commerce-button--danger"
+                              disabled={commerceBusy === plan.id}
+                              onClick={() => void cancelReservation(plan)}
+                            >
+                              {commerceBusy === plan.id
+                                ? "Requesting…"
+                                : "Confirm test refund"}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    {plan.state === "draft" && reviewingPlan !== plan.id && (
+                      <button
+                        type="button"
+                        className="commerce-button"
+                        onClick={() => setReviewingPlan(plan.id)}
+                      >
+                        Review $1 sandbox checkout
+                      </button>
+                    )}
+                    {plan.state === "confirmed" &&
+                      reviewingPlan !== plan.id && (
+                        <button
+                          type="button"
+                          className="secondary-button"
+                          onClick={() => setReviewingPlan(plan.id)}
+                        >
+                          Cancel demo reservation
+                        </button>
+                      )}
+                  </div>
+                  <div className="plan-facts">
+                    <span>
+                      {plan.event.source === "ticketmaster"
+                        ? "Ticketmaster snapshot"
+                        : "Demo fixture snapshot"}
+                    </span>
+                    <span>
+                      Saved {new Date(plan.createdAt).toLocaleString()}
+                    </span>
+                  </div>
+                </article>
+              ))}
+            </div>
           )}
         </section>
 
@@ -324,10 +691,10 @@ export function App() {
           </article>
           <article>
             <span>03</span>
-            <h2>No purchase yet</h2>
+            <h2>Governed sandbox</h2>
             <p>
-              Discovery links to the provider. Scout cannot reserve or issue
-              tickets in this phase.
+              Explicit confirmation starts a test payment; only a verified
+              webhook can confirm the demo reservation.
             </p>
           </article>
         </section>
@@ -342,7 +709,32 @@ export function App() {
   );
 }
 
-function EventCard({ event }: { event: RankedEvent }) {
+function planStateLabel(plan: SavedPlan) {
+  if (plan.state === "draft") {
+    return plan.checkout?.state === "failed"
+      ? "Draft · test payment failed"
+      : plan.checkout?.state === "expired"
+        ? "Draft · test checkout expired"
+        : "Draft · no payment";
+  }
+  if (plan.state === "payment_pending") return "Test payment · verifying";
+  if (plan.state === "confirmed") return "Confirmed · demo reservation";
+  if (plan.state === "cancellation_pending")
+    return "Cancellation · test refund pending";
+  return "Cancelled · test refund complete";
+}
+
+function EventCard({
+  event,
+  onSave,
+  saving,
+  saved,
+}: {
+  event: RankedEvent;
+  onSave: (event: RankedEvent) => Promise<void>;
+  saving: boolean;
+  saved: boolean;
+}) {
   const category =
     event.classification.genre ||
     event.classification.segment ||
@@ -373,6 +765,14 @@ function EventCard({ event }: { event: RankedEvent }) {
             <span key={reason}>{reason}</span>
           ))}
         </div>
+        <button
+          className="save-button"
+          type="button"
+          disabled={saving || saved}
+          onClick={() => void onSave(event)}
+        >
+          {saving ? "Saving…" : saved ? "Saved to My Plans" : "Save as draft"}
+        </button>
         <details>
           <summary>View details</summary>
           <div className="detail-panel">
