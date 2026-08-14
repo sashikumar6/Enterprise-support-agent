@@ -1,6 +1,6 @@
 # Phase 9 production hardening and public release acceptance
 
-Status: **IN PROGRESS**
+Status: **VERIFIED COMPLETE**
 
 Date started: 2026-08-14
 Last updated: 2026-08-14
@@ -23,7 +23,7 @@ to production.
 | Deployment smoke            | Versioned command checks public HTML, health/readiness, headers, static assets, desktop/mobile UI, and safe fixture journey                                              | Readiness failure, provider/AI failure, unknown API route, unauthorized operations, and stale asset/version detection                    | Verified |
 | Migrations                  | Clean database applies every ordered migration before deployment and readiness passes                                                                                    | Reapply is safe; missing migration prevents promotion; rollback documents forward-only data handling                                     | Verified |
 | Rollback/runbook            | Previously known-good Worker version can be restored and smoke-tested without changing D1 data                                                                           | Failed deploy, failed migration, provider outage, and compromised-secret procedures are rehearsed                                        | Verified |
-| Clean-clone reproducibility | Fresh checkout completes `npm ci`, local migration, quality gates, browser suite, and documented demo                                                                    | No provider accounts/secrets: fixture and deterministic fallback still work                                                              | Pending  |
+| Clean-clone reproducibility | Fresh checkout completes `npm ci`, local migration, quality gates, browser suite, and documented demo                                                                    | No provider accounts/secrets: fixture and deterministic fallback still work                                                              | Verified |
 | Complete golden path        | Public typed and voice discovery, live facts, explicit confirmation, Stripe test webhook, durable receipt, refund, lifecycle alert, and protected operations correlation | Live/fixture, AI enabled/disabled, payment success/failure/replay, owner/non-owner, status changed/unchanged, and speech success/failure | Verified |
 | Release documentation       | Architecture/limitations, seeded demo, recruiter script, screenshots, README, runbook, and truthful resume bullets match deployed behavior                               | Claims audit rejects real-ticket, real-charge, arbitrary-location, staffed-support, SLA, or unused-technology claims                     | Verified |
 
@@ -84,11 +84,6 @@ Phase 9 release configuration change:
 - Direct edge inspection confirmed CSP, Permissions Policy, Referrer Policy,
   `X-Content-Type-Options: nosniff`, and `X-Frame-Options: DENY` on HTML and API responses. The shell
   permits microphone use only from itself; API responses disable microphone access.
-
-## Evidence still required before closure
-
-- Clean-source reproduction from the release commit with install, migrations, quality gates, and
-  browser tests.
 
 ## Abuse-control and migration evidence
 
@@ -159,3 +154,20 @@ Phase 9 release configuration change:
   release suite passed 4/4 in 1.8 seconds.
 - `docs/RELEASE_RUNBOOK.md` covers forward-only migration handling, failed readiness, provider/AI
   outage, Stripe failure, credential exposure, bad static releases, and limiter regressions.
+
+## Clean-clone evidence
+
+- Release candidate commit `31a83ec` was cloned with `--no-local` into a new temporary directory.
+  The clone had no existing `node_modules`, local D1 state, or provider secret files.
+- `npm ci` installed 256 packages and reported zero vulnerabilities.
+- `npm run migrate:local` applied migrations `0001` through `0007` in order to the new local D1.
+- `npm run check` passed formatting, lint, TypeScript, the secret scan, 105 tests, and both
+  production builds.
+- `npm run test:e2e` passed all 10 desktop/mobile fixture and operations journeys in 13.9 seconds.
+
+## Final result
+
+Phase 9 is **VERIFIED COMPLETE** on 2026-08-14. The public production URL, isolated deployment,
+governed golden path, deterministic abuse ceiling, rollback, documentation, screenshots, and
+clean-clone reproduction all passed their paired acceptance gates. The product remains explicitly
+New York-only, test-payment-only, and a feasibility portfolio application.

@@ -1,6 +1,6 @@
 # Scout project handoff
 
-Status: Phases 3, 6, 7A, 7, and 8 verified complete; Phase 9 in progress
+Status: Phase 9 verified complete; public production release active
 Last updated: 2026-08-14
 Working name: **Scout** (provisional; perform a naming/trademark check before public launch)
 
@@ -1566,6 +1566,13 @@ the deployed URL in desktop/mobile browsers, keyboard and accessibility paths, l
 failure modes, abuse controls, migrations, secret absence, deployment rollback, and the complete
 golden path. Screenshots or a successful deployment command alone do not close Phase 9.
 
+Result: **VERIFIED COMPLETE 2026-08-14**. The isolated public Worker at
+`https://scout-production.veeravaagu-vishal.workers.dev` passed desktop/mobile release smoke,
+live Ticketmaster, governed AI, TTS/transcription, protected operations, Stripe test checkout and
+refund, D1 state, deterministic abuse-limit, and rollback checks. Release candidate `31a83ec`
+also reproduced from a secret-free clean clone with all seven migrations, 105 tests/build checks,
+and 10/10 browser journeys. Detailed evidence is in `docs/RELEASE_ACCEPTANCE.md`.
+
 ### Phase 10: optional breadth, only after completion
 
 - Gemini provider adapter and comparative eval dashboard
@@ -1998,26 +2005,32 @@ Create the empty `scout-production` D1 separately from `scout-preview` and apply
 do not copy preview guest, operator, payment, or telemetry data. Production credential
 provisioning and the Stripe test webhook remain pending explicit approval to transfer the local
 credentials into the Cloudflare production secret store and create the external Stripe endpoint.
-Phase 9 therefore remains in progress.
+At that point, Phase 9 remained in progress.
+
+### 2026-08-14 — Close Phase 9 after production, rollback, and clean-clone acceptance
+
+Decision: close Phase 9 and retain Worker version `eefba0f6-9fff-4673-b5af-5d0a03a75fd8` as the
+accepted public deployment. Production uses its own Worker, D1, secret store, Stripe test webhook,
+and rate-limit namespaces; no preview records were copied. The full governed test-payment journey,
+live provider/AI/voice channels, protected operations, deterministic D1-backed rate limit, final
+screenshots, and version rollback all passed. Release candidate `31a83ec` then passed a fresh
+secret-free clone, migrations `0001`–`0007`, 105 tests/build checks, and 10/10 browser journeys.
+Reason: every Phase 9 matrix row now has deployed or reproducible evidence, so the stable portfolio
+link and repository meet the documented release outcome.
 
 ## 29. Immediate next action for a new Codex session
 
-Continue Phase 9 production hardening and public release. The release matrix and current evidence
-are in `docs/RELEASE_ACCEPTANCE.md`. Preview version
-`9a4240cb-e9e2-4577-aee4-fc1a9bd47c53` serves the security headers, skip path, and authoritative
-D1-backed abuse controls; its deployed release suite passes 4/4 and its live threshold test passes.
-Production D1 exists separately with migrations through `0007` and no copied preview data.
-Preserve the Phase 8 privacy-hardened observability settings and keep production isolated.
+No required implementation phase remains. Phase 9 is closed and the accepted public URL is
+`https://scout-production.veeravaagu-vishal.workers.dev`; final evidence is in
+`docs/RELEASE_ACCEPTANCE.md`. Preserve the isolated production D1/secrets, Stripe test-mode-only
+boundary, deterministic D1-backed abuse controls, and Phase 8 privacy-hardened observability.
 
 The current product is New York-only. Do not broaden the next task to Boston or arbitrary markets
 unless the owner explicitly chooses geographic expansion; if approved, use the separate multi-city
 gate in section 5.4 before making broader claims.
 
-1. Obtain explicit approval to store the local Ticketmaster, Stripe, and operator credentials in
-   Cloudflare's production secret store and create the Stripe test-mode production webhook.
-2. Deploy production, then complete production desktop/mobile, accessibility, provider, voice,
-   Stripe, lifecycle, protected-operations, and isolation evidence.
-3. Perform and smoke-test a Worker version rollback, then restore the accepted release.
-4. Verify a clean source copy with `npm ci`, migrations, quality gates, and browser tests.
-5. Capture final production screenshots, audit release claims, close
-   `docs/RELEASE_ACCEPTANCE.md`, and only then commit and publish the release branch.
+1. Publish the completed `scout` branch and open the release pull request.
+2. Keep Phase 10 optional. Begin one of its breadth items only when the owner supplies a concrete
+   portfolio/job requirement and accepts that item's separate evidence gate.
+3. For maintenance, follow `docs/RELEASE_RUNBOOK.md`; do not broaden geography or enable real
+   payments/ticketing without a separately approved product and provider-compliance phase.
