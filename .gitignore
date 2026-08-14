@@ -1,16 +1,21 @@
-# Python
-__pycache__/
-*.py[cod]
-.venv/
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
 
-# Local demo state (created automatically on first run)
-data/*.db
+# Cloudflare local state
+.wrangler/
 
-# Frontend dependencies and builds
-frontend/node_modules/
-frontend/dist/
+# Local databases and generated reports
+*.db
+*.db-shm
+*.db-wal
 
 # Environment and editor files
 .env
 .env.*
+!.env.example
 .DS_Store

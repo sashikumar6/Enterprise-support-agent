@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": true,
+    "strict": true,
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["@cloudflare/workers-types", "vitest/globals"],
+    "skipLibCheck": true
+  },
+  "include": ["src"],
+  "references": [{ "path": "../../packages/core" }]
+}

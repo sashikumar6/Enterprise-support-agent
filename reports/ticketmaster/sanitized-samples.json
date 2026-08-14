@@ -1,0 +1,983 @@
+{
+  "generatedAt": "2026-08-14T01:57:24.264Z",
+  "window": {
+    "start": "2026-08-14T01:57:12Z",
+    "end": "2026-09-13T01:57:12Z"
+  },
+  "events": {
+    "Boston": [
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "vv1AvZk8PGkdN1hFd",
+        "name": "Chris Stapleton's All-American Road Show - Platinum Tickets",
+        "providerUrl": "https://www.ticketmaster.com/chris-stapletons-allamerican-road-show-platinum-boston-massachusetts-08-14-2026/event/01006425E329B203",
+        "start": {
+          "dateTime": "2026-08-14T21:30:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "17:30:00",
+          "timezone": "America/New_York",
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Fenway Park",
+          "city": "Boston",
+          "stateCode": "MA",
+          "countryCode": "US",
+          "latitude": "42.34640720",
+          "longitude": "-71.09865840"
+        },
+        "classification": {
+          "segment": "Music",
+          "genre": "Country",
+          "subGenre": "Country"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/a/c20/b21506f9-d0c6-403c-94ed-03d4a5d93c20_TABLET_LANDSCAPE_LARGE_16_9.jpg",
+          "width": 2048,
+          "height": 1152
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "vv177Z_eGkMKH2ek",
+        "name": "Gin Blossoms/Blues Traveler with Spin Doctors",
+        "providerUrl": "https://www.ticketmaster.com/gin-blossomsblues-traveler-with-spin-doctors-boston-massachusetts-08-14-2026/event/0100642DD3F0F086",
+        "start": {
+          "dateTime": "2026-08-14T22:00:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "18:00:00",
+          "timezone": "America/New_York",
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Leader Bank Pavilion",
+          "city": "Boston",
+          "stateCode": "MA",
+          "countryCode": "US",
+          "latitude": "42.34851323",
+          "longitude": "-71.03587836"
+        },
+        "classification": {
+          "segment": "Music",
+          "genre": "Rock",
+          "subGenre": "Alternative Rock"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/a/b60/308e095e-4824-4874-8ab8-7dfaca261b60_TABLET_LANDSCAPE_LARGE_16_9.jpg",
+          "width": 2048,
+          "height": 1152
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "Z7r9jZ1A7xFkF",
+        "name": "Will Wood (18 and Over)",
+        "providerUrl": "https://www.ticketmaster.com/event/Z7r9jZ1A7xFkF",
+        "start": {
+          "dateTime": "2026-08-14T22:30:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "18:30:00",
+          "timezone": null,
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Royale Boston",
+          "city": "Boston",
+          "stateCode": "MA",
+          "countryCode": "US",
+          "latitude": "42.349602000",
+          "longitude": "-71.075302000"
+        },
+        "classification": {
+          "segment": "Music",
+          "genre": "Other",
+          "subGenre": "Other"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/c/060/c5c08e7a-9912-456c-a060-2758be94e060_105881_TABLET_LANDSCAPE_LARGE_16_9.jpg",
+          "width": 2048,
+          "height": 1152
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "Z7r9jZ1A7OZ3b",
+        "name": "Chance Pena",
+        "providerUrl": "https://www.ticketmaster.com/event/Z7r9jZ1A7OZ3b",
+        "start": {
+          "dateTime": "2026-08-14T23:00:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "19:00:00",
+          "timezone": null,
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Roadrunner-Boston",
+          "city": "Boston",
+          "stateCode": "MA",
+          "countryCode": "US",
+          "latitude": "42.348900000",
+          "longitude": "-71.156502000"
+        },
+        "classification": {
+          "segment": "Music",
+          "genre": "Rock",
+          "subGenre": "Rock"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/a/bd7/9f5abf0e-f1fb-4d6a-b06d-659a1fd69bd7_RETINA_PORTRAIT_3_2.jpg",
+          "width": 640,
+          "height": 427
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "Z7r9jZ1A7O9uI",
+        "name": "Chris Stapleton's All-American Road Show",
+        "providerUrl": "https://www.ticketmaster.com/event/Z7r9jZ1A7O9uI",
+        "start": {
+          "dateTime": "2026-08-14T23:30:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "19:30:00",
+          "timezone": null,
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Fenway Park",
+          "city": "Boston",
+          "stateCode": "MA",
+          "countryCode": "US",
+          "latitude": "42.346901000",
+          "longitude": "-71.102501000"
+        },
+        "classification": {
+          "segment": "Music",
+          "genre": "Country",
+          "subGenre": "Country Folk"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/a/c20/b21506f9-d0c6-403c-94ed-03d4a5d93c20_TABLET_LANDSCAPE_LARGE_16_9.jpg",
+          "width": 2048,
+          "height": 1152
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "vv168v0OyaeZ786Fk",
+        "name": "Majah Hype",
+        "providerUrl": "https://www.ticketmaster.com/majah-hype-boston-massachusetts-08-14-2026/event/010064839242F675",
+        "start": {
+          "dateTime": "2026-08-14T23:30:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "19:30:00",
+          "timezone": "America/New_York",
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "The Wilbur",
+          "city": "Boston",
+          "stateCode": "MA",
+          "countryCode": "US",
+          "latitude": "42.35048430",
+          "longitude": "-71.06508600"
+        },
+        "classification": {
+          "segment": "Arts & Theatre",
+          "genre": "Comedy",
+          "subGenre": "Comedy"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/a/3a6/bd4d65a6-3c4a-4573-b74c-4edb52fbb3a6_1175711_TABLET_LANDSCAPE_16_9.jpg",
+          "width": 1024,
+          "height": 576
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "vv1AvZk8EGkdMKrg4",
+        "name": "Chris Stapleton's All-American Road Show",
+        "providerUrl": "http://www.redsox.com/ChrisStapleton",
+        "start": {
+          "dateTime": "2026-08-14T23:30:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "19:30:00",
+          "timezone": "America/New_York",
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Fenway Park",
+          "city": "Boston",
+          "stateCode": "MA",
+          "countryCode": "US",
+          "latitude": "42.34640720",
+          "longitude": "-71.09865840"
+        },
+        "classification": {
+          "segment": "Music",
+          "genre": "Country",
+          "subGenre": "Country"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/a/c20/b21506f9-d0c6-403c-94ed-03d4a5d93c20_TABLET_LANDSCAPE_LARGE_16_9.jpg",
+          "width": 2048,
+          "height": 1152
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "vvG17Z_GJL--UW",
+        "name": "WWE Friday Night SmackDown",
+        "providerUrl": "https://www.ticketmaster.com/wwe-friday-night-smackdown-boston-massachusetts-08-14-2026/event/010064C99F861DBD",
+        "start": {
+          "dateTime": "2026-08-14T23:30:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "19:30:00",
+          "timezone": "America/New_York",
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "TD Garden",
+          "city": "Boston",
+          "stateCode": "MA",
+          "countryCode": "US",
+          "latitude": "42.36584100",
+          "longitude": "-71.06072400"
+        },
+        "classification": {
+          "segment": "Sports",
+          "genre": "Wrestling",
+          "subGenre": "Wrestling"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/a/380/bf11c4a6-7591-40d0-babc-f357525e0380_SOURCE",
+          "width": 2426,
+          "height": 1365
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "vvG17Z_5pI3L-0",
+        "name": "Electric Feels: Indie Rock + Electronic Dance Party ( 18+ )",
+        "providerUrl": "https://www.ticketmaster.com/electric-feels-indie-rock-electronic-dance-boston-massachusetts-08-14-2026/event/010064B5A849F864",
+        "start": {
+          "dateTime": "2026-08-15T01:00:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "21:00:00",
+          "timezone": "America/New_York",
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Big Night Live",
+          "city": "Boston",
+          "stateCode": "MA",
+          "countryCode": "US",
+          "latitude": "42.36597700",
+          "longitude": "-71.06170000"
+        },
+        "classification": {
+          "segment": "Music",
+          "genre": "Pop",
+          "subGenre": "Electro Pop"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/a/d99/7d0d36d0-4cf5-4649-b647-d0e85bd55d99_SOURCE",
+          "width": 2626,
+          "height": 1765
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "1718v0G65n0L8xj",
+        "name": "Lost Frequencies",
+        "providerUrl": "https://www.ticketweb.com/event/lost-frequencies-royale-boston-tickets/14947823?REFERRAL_ID=tmfeed",
+        "start": {
+          "dateTime": "2026-08-15T02:00:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "22:00:00",
+          "timezone": "America/New_York",
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Royale Boston",
+          "city": "Boston",
+          "stateCode": "MA",
+          "countryCode": "US",
+          "latitude": "42.34975590",
+          "longitude": "-71.06531650"
+        },
+        "classification": {
+          "segment": "Music",
+          "genre": "Dance/Electronic",
+          "subGenre": "Amapiano"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/a/84a/414c383f-a5af-42cf-9a18-48fbf83ab84a_1041201_RETINA_PORTRAIT_3_2.jpg",
+          "width": 640,
+          "height": 427
+        }
+      }
+    ],
+    "New York": [
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "LvZ18QrWTgeialOZ0E4-1",
+        "name": "Museum of Chinese in America Flex Admission",
+        "providerUrl": "https://www.universe.com/events/museum-of-chinese-in-america-flex-admission-tickets-B9N1ZL?ref=ticketmaster",
+        "start": {
+          "dateTime": "2026-04-29T15:00:00Z",
+          "localDate": "2026-04-29",
+          "localTime": "11:00:00",
+          "timezone": "America/New_York",
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Museum of Chinese in America",
+          "city": "New York",
+          "stateCode": "NY",
+          "countryCode": "US",
+          "latitude": "40.71953297",
+          "longitude": "-73.99902914"
+        },
+        "classification": {
+          "segment": "Miscellaneous",
+          "genre": "Undefined",
+          "subGenre": "Undefined"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/c/03e/e15ef00f-2c87-4421-ae61-d740851a703e_105891_RETINA_PORTRAIT_16_9.jpg",
+          "width": 640,
+          "height": 360
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "rZ7HnEZ1Af-0uN",
+        "name": "Monty Alexander",
+        "providerUrl": "https://www.ticketweb.com/event/monty-alexander-birdland-jazz-club-tickets/14864363",
+        "start": {
+          "dateTime": "2026-08-14T01:30:00Z",
+          "localDate": "2026-08-13",
+          "localTime": "21:30:00",
+          "timezone": "America/New_York",
+          "status": "offsale"
+        },
+        "venue": {
+          "name": "Birdland Jazz Club",
+          "city": "New York",
+          "stateCode": "NY",
+          "countryCode": "US",
+          "latitude": "40.7590167",
+          "longitude": "-73.9896861"
+        },
+        "classification": {
+          "segment": "Music",
+          "genre": "Jazz",
+          "subGenre": "Jazz"
+        },
+        "priceRange": {
+          "min": 45.76,
+          "max": 56.06,
+          "currency": "USD"
+        },
+        "image": {
+          "url": "https://s1.ticketm.net/dam/c/bea/03d47f66-d37b-4aca-aa17-0135be64dbea_105801_RETINA_PORTRAIT_3_2.jpg",
+          "width": 640,
+          "height": 427
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "rZ7HnEZ1Afro-K",
+        "name": "Dizzy Gillespie All-Star Big Band",
+        "providerUrl": "https://www.ticketweb.com/event/dizzy-gillespie-all-star-big-blue-note-jazz-club-tickets/14791853",
+        "start": {
+          "dateTime": "2026-08-14T02:30:00Z",
+          "localDate": "2026-08-13",
+          "localTime": "22:30:00",
+          "timezone": "America/New_York",
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Blue Note Jazz Club",
+          "city": "New York",
+          "stateCode": "NY",
+          "countryCode": "US",
+          "latitude": "40.730940",
+          "longitude": "-74.000650"
+        },
+        "classification": {
+          "segment": "Music",
+          "genre": "Jazz",
+          "subGenre": "Jazz"
+        },
+        "priceRange": {
+          "min": 38.1,
+          "max": 54.99,
+          "currency": "USD"
+        },
+        "image": {
+          "url": "https://s1.ticketm.net/dam/c/bea/03d47f66-d37b-4aca-aa17-0135be64dbea_105801_RETINA_LANDSCAPE_16_9.jpg",
+          "width": 1136,
+          "height": 639
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "G5dYZ_AIaGeCS",
+        "name": "Radio City Music Hall Tour Experience",
+        "providerUrl": "https://www.ticketmaster.com/radio-city-music-hall-tour-experience-new-york-new-york-08-13-2026/event/3C00645A093023B3",
+        "start": {
+          "dateTime": null,
+          "localDate": "2026-08-13",
+          "localTime": null,
+          "timezone": "America/New_York",
+          "status": "offsale"
+        },
+        "venue": {
+          "name": "Radio City Music Hall Tour Experience",
+          "city": "New York",
+          "stateCode": "NY",
+          "countryCode": "US",
+          "latitude": "40.75997700",
+          "longitude": "-73.97997500"
+        },
+        "classification": {
+          "segment": "Miscellaneous",
+          "genre": "Undefined",
+          "subGenre": "Undefined"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/a/ad0/0c879104-ba01-492c-846f-379581c53ad0_RETINA_LANDSCAPE_16_9.jpg",
+          "width": 1136,
+          "height": 639
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "G5diZ_Akom3r7",
+        "name": "Madison Square Garden Tour Experience",
+        "providerUrl": "https://www.ticketmaster.com/madison-square-garden-tour-experience-new-york-new-york-08-13-2026/event/3B00645191B92784",
+        "start": {
+          "dateTime": null,
+          "localDate": "2026-08-13",
+          "localTime": null,
+          "timezone": "America/New_York",
+          "status": "offsale"
+        },
+        "venue": {
+          "name": "Madison Square Garden",
+          "city": "New York",
+          "stateCode": "NY",
+          "countryCode": "US",
+          "latitude": "40.74970620",
+          "longitude": "-73.99160060"
+        },
+        "classification": {
+          "segment": "Miscellaneous",
+          "genre": "Undefined",
+          "subGenre": "Undefined"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/a/476/7c230b41-d92a-4fd4-b6d1-dc6951ae8476_RETINA_PORTRAIT_16_9.jpg",
+          "width": 640,
+          "height": 360
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "LvZ18Qk4nbbEibYZvnOCy",
+        "name": "Banksy Museum - Flexiticket",
+        "providerUrl": "https://www.universe.com/events/banksy-museum-flexiticket-tickets-F7XJ8T?ref=ticketmaster",
+        "start": {
+          "dateTime": "2026-08-14T14:00:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "10:00:00",
+          "timezone": "America/New_York",
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Banksy Museum New York",
+          "city": "New York",
+          "stateCode": "NY",
+          "countryCode": "US",
+          "latitude": "40.71960250",
+          "longitude": "-74.00135811"
+        },
+        "classification": {
+          "segment": "Arts & Theatre",
+          "genre": "Fine Art",
+          "subGenre": "Fine Art"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/a/438/d47dcb31-a7ee-4820-aa73-cc46f2473438_TABLET_LANDSCAPE_16_9.jpg",
+          "width": 1024,
+          "height": 576
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "LvZ18QrTdtviDfOZvhDRW",
+        "name": "The Banksy Museum New York!",
+        "providerUrl": "https://www.universe.com/events/the-banksy-museum-new-york-tickets-5PKNY0?ref=ticketmaster",
+        "start": {
+          "dateTime": "2026-08-14T14:00:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "10:00:00",
+          "timezone": "America/New_York",
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Banksy Museum New York",
+          "city": "New York",
+          "stateCode": "NY",
+          "countryCode": "US",
+          "latitude": "40.71960250",
+          "longitude": "-74.00135811"
+        },
+        "classification": {
+          "segment": "Arts & Theatre",
+          "genre": "Fine Art",
+          "subGenre": "Fine Art"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/a/438/d47dcb31-a7ee-4820-aa73-cc46f2473438_TABLET_LANDSCAPE_16_9.jpg",
+          "width": 1024,
+          "height": 576
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "LvZ18QrTdtviDfOZvhDRX",
+        "name": "The Banksy Museum New York!",
+        "providerUrl": "https://www.universe.com/events/the-banksy-museum-new-york-tickets-5PKNY0?ref=ticketmaster",
+        "start": {
+          "dateTime": "2026-08-14T14:30:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "10:30:00",
+          "timezone": "America/New_York",
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Banksy Museum New York",
+          "city": "New York",
+          "stateCode": "NY",
+          "countryCode": "US",
+          "latitude": "40.71960250",
+          "longitude": "-74.00135811"
+        },
+        "classification": {
+          "segment": "Arts & Theatre",
+          "genre": "Fine Art",
+          "subGenre": "Fine Art"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/a/438/d47dcb31-a7ee-4820-aa73-cc46f2473438_TABLET_LANDSCAPE_16_9.jpg",
+          "width": 1024,
+          "height": 576
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "LvZ18QbKlF_lmuOZvOKEd",
+        "name": "Museum of Chinese in America General Admission",
+        "providerUrl": "https://www.universe.com/events/museum-of-chinese-in-america-general-admission-tickets-PZ7R68?ref=ticketmaster",
+        "start": {
+          "dateTime": "2026-08-14T15:00:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "11:00:00",
+          "timezone": "America/New_York",
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Museum of Chinese in America",
+          "city": "New York",
+          "stateCode": "NY",
+          "countryCode": "US",
+          "latitude": "40.71953297",
+          "longitude": "-73.99902914"
+        },
+        "classification": {
+          "segment": "Miscellaneous",
+          "genre": "Undefined",
+          "subGenre": "Undefined"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://images.universe.com/94505184-4d0b-41fa-a0f5-bae6cd11b740/-/resize/1200x/-/crop/536x536/79,59/-/format/jpeg/-/scale_crop/1024x576/center/-/progressive/yes/-/inline/yes/",
+          "width": 1024,
+          "height": 576
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "LvZ18QrTdtviDfOZvhDRT",
+        "name": "The Banksy Museum New York!",
+        "providerUrl": "https://www.universe.com/events/the-banksy-museum-new-york-tickets-5PKNY0?ref=ticketmaster",
+        "start": {
+          "dateTime": "2026-08-14T15:00:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "11:00:00",
+          "timezone": "America/New_York",
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Banksy Museum New York",
+          "city": "New York",
+          "stateCode": "NY",
+          "countryCode": "US",
+          "latitude": "40.71960250",
+          "longitude": "-74.00135811"
+        },
+        "classification": {
+          "segment": "Arts & Theatre",
+          "genre": "Fine Art",
+          "subGenre": "Fine Art"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/a/438/d47dcb31-a7ee-4820-aa73-cc46f2473438_TABLET_LANDSCAPE_16_9.jpg",
+          "width": 1024,
+          "height": 576
+        }
+      }
+    ],
+    "Philadelphia": [
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "vv17FZ_aGkwEmnHy",
+        "name": "Yannis Pappas",
+        "providerUrl": "https://www.ticketmaster.com/yannis-pappas-philadelphia-pennsylvania-08-14-2026/event/0200649CA7BAAF39",
+        "start": {
+          "dateTime": "2026-08-14T23:00:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "19:00:00",
+          "timezone": "America/New_York",
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Punch Line Philly",
+          "city": "Philadelphia",
+          "stateCode": "PA",
+          "countryCode": "US",
+          "latitude": "39.96581900",
+          "longitude": "-75.13475200"
+        },
+        "classification": {
+          "segment": "Arts & Theatre",
+          "genre": "Comedy",
+          "subGenre": "Comedy"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/a/dff/d5b4320c-ec22-463d-b541-01d783a3fdff_1837011_TABLET_LANDSCAPE_LARGE_16_9.jpg",
+          "width": 2048,
+          "height": 1152
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "vv17FZ_6GkT-GXJ5",
+        "name": "Jon Batiste - Jon Batiste Live",
+        "providerUrl": "https://www.ticketmaster.com/jon-batiste-jon-batiste-live-philadelphia-pennsylvania-08-14-2026/event/0200647FE133E98B",
+        "start": {
+          "dateTime": "2026-08-14T23:30:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "19:30:00",
+          "timezone": "America/New_York",
+          "status": "cancelled"
+        },
+        "venue": {
+          "name": "TD Pavilion at Highmark Mann",
+          "city": "Philadelphia",
+          "stateCode": "PA",
+          "countryCode": "US",
+          "latitude": "39.98150800",
+          "longitude": "-75.22406600"
+        },
+        "classification": {
+          "segment": "Music",
+          "genre": "Pop",
+          "subGenre": "Electro Pop"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/a/d6b/fdd49cc8-f3df-4c13-b3c4-831fea6d2d6b_SOURCE",
+          "width": 2426,
+          "height": 1365
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "Z7r9jZ1A7xvaN",
+        "name": "Eagles of Death Metal",
+        "providerUrl": "https://www.ticketmaster.com/event/Z7r9jZ1A7xvaN",
+        "start": {
+          "dateTime": "2026-08-15T00:00:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "20:00:00",
+          "timezone": null,
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Union Transfer",
+          "city": "Philadelphia",
+          "stateCode": "PA",
+          "countryCode": "US",
+          "latitude": "39.964001000",
+          "longitude": "-75.147697000"
+        },
+        "classification": {
+          "segment": "Music",
+          "genre": "Alternative",
+          "subGenre": "Alternative Rock"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/a/eb3/0ade9d43-0271-4e1b-ad86-398270068eb3_TABLET_LANDSCAPE_3_2.jpg",
+          "width": 1024,
+          "height": 683
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "vvG1FZ_27FzSxa",
+        "name": "Local Noise Philadelphia: Semifinals Night 2",
+        "providerUrl": "https://www.ticketmaster.com/local-noise-philadelphia-semifinals-night-2-philadelphia-pennsylvania-08-14-2026/event/020064F108E33889",
+        "start": {
+          "dateTime": "2026-08-15T00:00:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "20:00:00",
+          "timezone": "America/New_York",
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Brooklyn Bowl Philadelphia",
+          "city": "Philadelphia",
+          "stateCode": "PA",
+          "countryCode": "US",
+          "latitude": "39.96547300",
+          "longitude": "-75.13482900"
+        },
+        "classification": {
+          "segment": "Music",
+          "genre": "Other",
+          "subGenre": "Other"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/e/30e/b49305be-5694-4014-a843-505eb9db830e_RETINA_PORTRAIT_3_2.jpg",
+          "width": 640,
+          "height": 427
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "vv17FZ_aGkwERQWv",
+        "name": "Yannis Pappas",
+        "providerUrl": "https://www.ticketmaster.com/yannis-pappas-philadelphia-pennsylvania-08-14-2026/event/0200649CA7BDAF41",
+        "start": {
+          "dateTime": "2026-08-15T01:15:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "21:15:00",
+          "timezone": "America/New_York",
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Punch Line Philly",
+          "city": "Philadelphia",
+          "stateCode": "PA",
+          "countryCode": "US",
+          "latitude": "39.96581900",
+          "longitude": "-75.13475200"
+        },
+        "classification": {
+          "segment": "Arts & Theatre",
+          "genre": "Comedy",
+          "subGenre": "Comedy"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/a/dff/d5b4320c-ec22-463d-b541-01d783a3fdff_1837011_TABLET_LANDSCAPE_LARGE_16_9.jpg",
+          "width": 2048,
+          "height": 1152
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "Z7r9jZ1A7JAZJ",
+        "name": "Next Level KPop Rave (21+ Event)",
+        "providerUrl": "https://www.ticketmaster.com/event/Z7r9jZ1A7JAZJ",
+        "start": {
+          "dateTime": "2026-08-15T01:30:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "21:30:00",
+          "timezone": null,
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "MilkBoy Philadelphia",
+          "city": "Philadelphia",
+          "stateCode": "PA",
+          "countryCode": "US",
+          "latitude": "39.951599000",
+          "longitude": "-75.158096000"
+        },
+        "classification": {
+          "segment": "Music",
+          "genre": "Pop",
+          "subGenre": "K-Pop"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/c/4f2/0109888a-61b5-4525-8432-b026ef04f4f2_105631_RETINA_PORTRAIT_16_9.jpg",
+          "width": 640,
+          "height": 360
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "Z7r9jZ1A7PI4t",
+        "name": "Blade Rave: A Vampire Themed Rave",
+        "providerUrl": "https://www.ticketmaster.com/event/Z7r9jZ1A7PI4t",
+        "start": {
+          "dateTime": "2026-08-15T02:00:00Z",
+          "localDate": "2026-08-14",
+          "localTime": "22:00:00",
+          "timezone": null,
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Underground Arts",
+          "city": "Philadelphia",
+          "stateCode": "PA",
+          "countryCode": "US",
+          "latitude": "39.951099000",
+          "longitude": "-75.150398000"
+        },
+        "classification": {
+          "segment": "Undefined",
+          "genre": null,
+          "subGenre": null
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/c/f51/ee785ed6-f806-4195-98f4-69f67e09df51_106201_RETINA_PORTRAIT_3_2.jpg",
+          "width": 640,
+          "height": 427
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "vv1AOv0_8GA2CHee",
+        "name": "Big Wig Movies Brunch: The Ultimate Drag Experience",
+        "providerUrl": "https://www.ticketmaster.com/big-wig-movies-brunch-the-ultimate-philadelphia-pennsylvania-08-15-2026/event/020064650F3BC082",
+        "start": {
+          "dateTime": "2026-08-15T16:00:00Z",
+          "localDate": "2026-08-15",
+          "localTime": "12:00:00",
+          "timezone": "America/New_York",
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Punch Line Philly",
+          "city": "Philadelphia",
+          "stateCode": "PA",
+          "countryCode": "US",
+          "latitude": "39.96581900",
+          "longitude": "-75.13475200"
+        },
+        "classification": {
+          "segment": "Arts & Theatre",
+          "genre": "Performance Art",
+          "subGenre": "Performance Art"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/e/2b7/5ce9565d-54b8-4f66-85c1-99f713a612b7_TABLET_LANDSCAPE_3_2.jpg",
+          "width": 1024,
+          "height": 683
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "17GZv0G6uJvIevf",
+        "name": "Suites - UFC 330: Makhachev vs Machado Garry",
+        "providerUrl": "https://www.ticketmaster.com/suites-ufc-330-makhachev-vs-machado-philadelphia-pennsylvania-08-15-2026/event/300064D981A02054",
+        "start": {
+          "dateTime": "2026-08-15T21:30:00Z",
+          "localDate": "2026-08-15",
+          "localTime": "17:30:00",
+          "timezone": "America/New_York",
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Xfinity Mobile Arena",
+          "city": "Philadelphia",
+          "stateCode": "PA",
+          "countryCode": "US",
+          "latitude": "39.90455100",
+          "longitude": "-75.17362730"
+        },
+        "classification": {
+          "segment": "Miscellaneous",
+          "genre": "Community/Civic",
+          "subGenre": "Community/Civic"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/c/03e/e15ef00f-2c87-4421-ae61-d740851a703e_105891_RETINA_LANDSCAPE_16_9.jpg",
+          "width": 1136,
+          "height": 639
+        }
+      },
+      {
+        "provider": "ticketmaster",
+        "providerEventId": "17GZv0G6uky0dYV",
+        "name": "UFC 330: Makhachev vs Machado Garry",
+        "providerUrl": "https://www.ticketmaster.com/ufc-330-makhachev-vs-machado-garry-philadelphia-pennsylvania-08-15-2026/event/300064D1B9903C34",
+        "start": {
+          "dateTime": "2026-08-15T21:30:00Z",
+          "localDate": "2026-08-15",
+          "localTime": "17:30:00",
+          "timezone": "America/New_York",
+          "status": "onsale"
+        },
+        "venue": {
+          "name": "Xfinity Mobile Arena",
+          "city": "Philadelphia",
+          "stateCode": "PA",
+          "countryCode": "US",
+          "latitude": "39.90455100",
+          "longitude": "-75.17362730"
+        },
+        "classification": {
+          "segment": "Sports",
+          "genre": "Martial Arts",
+          "subGenre": "Mixed Martial Arts"
+        },
+        "priceRange": null,
+        "image": {
+          "url": "https://s1.ticketm.net/dam/a/138/09f8507b-e5bd-400f-8363-8c3b83e82138_TABLET_LANDSCAPE_3_2.jpg",
+          "width": 1024,
+          "height": 683
+        }
+      }
+    ]
+  }
+}

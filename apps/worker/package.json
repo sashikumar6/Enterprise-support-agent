@@ -1,0 +1,11 @@
+{
+  "name": "@scout/worker",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@scout/core": "*"
+  },
+  "scripts": {
+    "build": "XDG_CONFIG_HOME=.wrangler/config WRANGLER_LOG_PATH=.wrangler/logs/wrangler.log wrangler deploy --dry-run --outdir dist/worker"
+  }
+}

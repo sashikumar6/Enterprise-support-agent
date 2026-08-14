@@ -1,54 +1,58 @@
-# SupportIQ — Enterprise Customer-Service Agent 
+# Scout
 
-SupportIQ is a policy-controlled, omnichannel service agent. This pilot is configured for **ConnectLine**, a telecommunications company. It is deliberately built around enterprise boundaries: the AI plans a resolution, a policy engine authorizes it, and connector-shaped tools execute persistent actions.
+Scout is a production-shaped consumer AI events concierge. It will accept typed or
+push-to-talk requests, turn natural-language preferences into recommendations from live event
+data, require confirmation before actions, simulate checkout through Stripe test mode, and
+persist demo reservations.
 
-## What the demo proves
+The Ticketmaster data-quality spike selected New York as the launch city. The Phase 2
+engineering foundation now provides a React shell, Hono Worker API, provider-neutral core,
+local D1 migrations, tests, and CI. Phase 3 is deterministic live discovery.
 
-- One agent runtime for web chat, email intake, and browser voice.
-- Policy-backed autonomous actions: verify an outage, issue a permitted service credit, send a notification, remotely refresh a device, and book a technician after customer confirmation.
-- Human handoff only for sensitive cases or explicit requests, with the full context retained.
-- Operations dashboard with the tool/action log, policy source, containment metric, and escalations.
+Read [the complete project handoff](docs/PROJECT_HANDOFF.md) for product scope, architecture,
+provider limitations, zero-cost constraints, implementation phases, and definition of done.
 
-The CRM, billing, network operations, device, scheduling, and notification systems are local persistent simulators with interfaces designed to be swapped for real enterprise APIs.
+Important product boundary: live event discovery does not make Scout a real ticket issuer.
+Checkout and reservations will be explicitly labeled simulations, and no real money or ticket
+inventory will move.
 
-## Run locally
+## Ticketmaster data-quality spike
 
-Terminal 1:
+The Phase 1 spike runs without third-party dependencies:
 
-```bash
-python3 -m uvicorn backend.main:app --reload --port 8123
+```sh
+npm test
+npm run spike:ticketmaster
 ```
 
-Terminal 2:
+The live command reads `TICKETMASTER_API_KEY` from the ignored `.env.local` file and writes a
+repeatable report plus normalized, sanitized samples to `reports/ticketmaster/`. It never logs
+the key or stores raw provider responses.
 
-```bash
-cd frontend
-npm install
+The generated report is available at
+[`reports/ticketmaster/data-quality-report.md`](reports/ticketmaster/data-quality-report.md).
+
+## Local foundation
+
+Node.js 22 or newer is required. No Cloudflare account or provider secret is needed for the
+local foundation:
+
+```sh
+npm ci
+npm run migrate:local
 npm run dev
 ```
 
-Open `http://127.0.0.1:5173`.
+Open <http://127.0.0.1:8787>. The same Worker serves the responsive React shell and versioned
+API. Useful checks:
 
-## Demo script
+```sh
+curl http://127.0.0.1:8787/api/v1/health
+curl http://127.0.0.1:8787/api/v1/readiness
+npm run check
+npm run test:e2e
+```
 
-1. In **Customer chat**, select **“My internet has been down all morning.”**
-   - The agent checks the network system, finds a verified five-hour outage, applies the policy-permitted $10 credit, and sends an update.
-2. Select **“Schedule a technician.”**, then **“Yes, book the first one.”**
-   - It searches availability, waits for customer confirmation, then books a persistent appointment.
-3. Open **Email** and send the same outage request.
-   - The same runtime receives it through email and responds with a logged action trace.
-4. Open **Voice call**, speak or paste a transcript, then submit.
-   - The browser transcribes when supported and reads the response aloud.
-5. Open **Agent operations** to show completed tools, policies used, and escalated tickets.
-6. In chat, send **“I need a manager.”** to show a full-context escalation.
-
-## Product stages
-
-1. **Core:** tenant model, policy engine, connector contracts, audit trail, normalized conversation events.
-2. **Pilot workflows:** customer/account, outage, device, billing, scheduling, and notification integrations.
-3. **Omnichannel customer experience:** chat, inbound email, and voice using one agent runtime.
-4. **Enterprise operations:** human handoff dashboard, analytics, policy oversight, and a demo runbook.
-
-## Production replacement path
-
-Keep `SupportAgent` and the policy engine. Replace each `EnterpriseStore` method with an authenticated connector to the customer’s CRM, billing, network, device, scheduling, and notification systems. The agent must never receive unapproved tool access; policy authorization occurs before the connector action.
+The complete Phase 2 checks and environment inventory are in
+[`docs/FOUNDATION_ACCEPTANCE.md`](docs/FOUNDATION_ACCEPTANCE.md). Architecture decisions live
+in [`docs/adr`](docs/adr).
