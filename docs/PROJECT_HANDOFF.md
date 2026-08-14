@@ -1,7 +1,7 @@
 # Scout project handoff
 
-Status: Phase 4 complete; Phase 5 Stripe sandbox is next
-Last updated: 2026-08-13  
+Status: Phase 5 implementation complete; live Stripe sandbox acceptance pending
+Last updated: 2026-08-14
 Working name: **Scout** (provisional; perform a naming/trademark check before public launch)
 
 ## 1. Purpose of this document
@@ -22,6 +22,8 @@ A new developer or coding agent should be able to read this document and underst
 6. What constitutes a convincing completed portfolio product.
 
 This is a living document. Material changes belong in the decision log near the end.
+Phase closure also requires updating this status line, the phase result, its acceptance
+document, the decision log, and the immediate next action before work advances.
 
 ## 2. Executive decision
 
@@ -1235,7 +1237,7 @@ replays. My Plans persists across reloads and clearly states that drafts are not
 tickets, or purchases. Unit/API tests, local D1 migration, production builds, and desktop/mobile
 browser journeys passed. The contract and evidence are recorded in `docs/PLANS_ACCEPTANCE.md`.
 
-### Phase 5: Stripe sandbox
+### Phase 5: Stripe sandbox — implementation complete; acceptance pending
 
 Outcome: a test payment drives a reservation through a verified webhook.
 
@@ -1246,6 +1248,22 @@ Outcome: a test payment drives a reservation through a verified webhook.
 - Persistent demo receipt
 
 Verification: complete Playwright/test-mode journey and webhook replay tests.
+
+Implementation result: **COMPLETE**. Scout now has a provider-neutral `PaymentProvider`, a
+Stripe sandbox REST adapter, a fixed $1.00 demo Checkout Session explicitly unrelated to
+provider ticket pricing, an owner-scoped and idempotent checkout API, and a two-step user
+confirmation. Stripe return redirects are non-authoritative. Only a timestamp-bounded,
+HMAC-verified webhook can advance checkout and reservation state. D1 migrations atomically
+record checkout, payment-event, reservation-transition, audit, cancellation, and refund state;
+duplicate provider events replay safely and out-of-order terminal events are rejected. My Plans
+renders pending states, a persistent demo receipt, and a two-step test-refund flow without
+claiming Ticketmaster fulfillment. Formatting, lint, type checking, secret scanning, 41
+automated tests, local migrations, and production builds pass.
+
+Acceptance status: **PENDING**. The required real Stripe test-mode browser journey has not run.
+The local database currently contains drafts only and no checkout or payment events. Complete
+the success/webhook/receipt and cancellation/refund journey before changing this phase to
+complete or beginning Phase 6. The evidence checklist is `docs/STRIPE_ACCEPTANCE.md`.
 
 ### Phase 6: AI orchestration
 
@@ -1548,21 +1566,27 @@ future checkout/payment records and state transitions now, but expose no payment
 endpoint until verified Stripe test-mode webhooks exist. Reason: this completes an honest,
 durable selection journey while preserving a safe boundary between user intent and commerce.
 
+### 2026-08-14 — Require explicit phase-closure documentation
+
+Decision: never declare a delivery phase complete or begin the next phase until its acceptance
+checks pass and the same change updates the phase acceptance document, handoff status line,
+phase result, decision log, and immediate next action. If implementation exists but a manual,
+provider-sandbox, browser, or deployment check remains, label the phase implementation complete
+and acceptance pending. Reason: the durable handoff must describe verified repository state
+without relying on the owner to request documentation updates after each phase.
+
 ## 29. Immediate next action for a new Codex session
 
-Phase 4 is complete. Do not add AI orchestration, voice, or operations surfaces yet. Begin
-Phase 5 by guiding the owner through just-in-time Stripe test-mode account setup; never ask
-them to paste a secret into chat.
+Phase 5 implementation is complete, but acceptance is still pending. Do not begin Phase 6 or
+label Phase 5 complete until the live Stripe sandbox journey passes.
 
-1. Read this handoff and `docs/PLANS_ACCEPTANCE.md` completely, then inspect the existing
-   reservation/checkout state contracts and D1 schema.
-2. Explain the required Stripe test-mode account, secret, and webhook setup step by step. Keep
-   secrets in ignored local configuration and Cloudflare secret storage only.
-3. Add a `PaymentProvider` port and Stripe test adapter without importing Stripe SDK concerns
-   into the domain.
-4. Create checkout only after an explicit user confirmation and retain the visible sandbox,
-   no-real-ticket notice.
-5. Advance payment and reservation state only from a signature-verified webhook using atomic
-   version predicates and replay-safe provider event IDs.
-6. Cover success, failure, expiry, duplicate/out-of-order webhook, cancellation, refund, and
-   persistent demo-receipt behavior with unit, integration, and browser tests.
+1. Start Scout locally with the ignored `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` values.
+2. Keep Stripe CLI forwarding the documented event allowlist to `/api/v1/stripe/webhook`.
+3. Complete the browser journey: fixture search -> save draft -> explicit confirmation ->
+   Stripe-hosted $1.00 test checkout -> verified webhook -> persistent demo receipt.
+4. Verify D1 contains a `succeeded` checkout, `confirmed` reservation, applied provider event,
+   transition/audit records, and no sensitive payment data.
+5. Explicitly cancel the demo reservation, verify the test refund webhook, and confirm durable
+   `cancelled`/`succeeded` states. Keep failed/expired and replay behavior covered by tests.
+6. Complete `docs/STRIPE_ACCEPTANCE.md`, then update this handoff to `Phase 5 complete; Phase 6
+AI orchestration is next` before beginning Phase 6.

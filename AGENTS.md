@@ -39,3 +39,12 @@ Before implementation, state assumptions and define a verifiable outcome. Build 
 the phase order in `docs/PROJECT_HANDOFF.md`; the Ticketmaster data-quality spike is
 the first go/no-go gate. Add tests with behavior, keep changes scoped, and update the
 handoff decision log when a material decision changes.
+
+Phase closure is mandatory. Before declaring any phase complete or starting the next phase:
+
+1. Run and record that phase's acceptance checks.
+2. Create or update its acceptance document under `docs/`.
+3. Update `docs/PROJECT_HANDOFF.md` in the same change: status line, phase heading and result,
+   decision log, and immediate next action.
+4. Do not label a phase complete when a required manual, provider-sandbox, browser, deployment,
+   or other acceptance check is still pending.
