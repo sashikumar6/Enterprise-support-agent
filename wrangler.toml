@@ -1,0 +1,163 @@
+name = "scout"
+main = "apps/worker/src/index.ts"
+compatibility_date = "2026-08-13"
+
+[observability]
+enabled = true
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = false
+
+[observability.traces]
+enabled = true
+head_sampling_rate = 1
+
+[assets]
+directory = "./dist/client"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+run_worker_first = ["/api/*"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "scout-local"
+database_id = "local-development"
+migrations_dir = "migrations"
+
+[vars]
+APP_ENV = "development"
+
+[[ratelimits]]
+name = "COSTLY_RATE_LIMITER"
+namespace_id = "9001"
+
+[ratelimits.simple]
+limit = 10
+period = 60
+
+[[ratelimits]]
+name = "MUTATION_RATE_LIMITER"
+namespace_id = "9002"
+
+[ratelimits.simple]
+limit = 12
+period = 60
+
+[[ratelimits]]
+name = "AUTH_RATE_LIMITER"
+namespace_id = "9003"
+
+[ratelimits.simple]
+limit = 5
+period = 60
+
+[env.ai.vars]
+APP_ENV = "development"
+
+[env.ai.ai]
+binding = "AI"
+remote = true
+
+[[env.ai.ratelimits]]
+name = "COSTLY_RATE_LIMITER"
+namespace_id = "9051"
+
+[env.ai.ratelimits.simple]
+limit = 10
+period = 60
+
+[[env.ai.ratelimits]]
+name = "MUTATION_RATE_LIMITER"
+namespace_id = "9052"
+
+[env.ai.ratelimits.simple]
+limit = 12
+period = 60
+
+[[env.ai.ratelimits]]
+name = "AUTH_RATE_LIMITER"
+namespace_id = "9053"
+
+[env.ai.ratelimits.simple]
+limit = 5
+period = 60
+
+[[env.ai.d1_databases]]
+binding = "DB"
+database_name = "scout-local"
+database_id = "local-development"
+migrations_dir = "migrations"
+
+[env.preview.vars]
+APP_ENV = "preview"
+
+[env.preview.ai]
+binding = "AI"
+
+[[env.preview.ratelimits]]
+name = "COSTLY_RATE_LIMITER"
+namespace_id = "9101"
+
+[env.preview.ratelimits.simple]
+limit = 10
+period = 60
+
+[[env.preview.ratelimits]]
+name = "MUTATION_RATE_LIMITER"
+namespace_id = "9102"
+
+[env.preview.ratelimits.simple]
+limit = 12
+period = 60
+
+[[env.preview.ratelimits]]
+name = "AUTH_RATE_LIMITER"
+namespace_id = "9103"
+
+[env.preview.ratelimits.simple]
+limit = 5
+period = 60
+
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "scout-preview"
+database_id = "f2e56e18-3cce-4975-844b-2508f8962fab"
+migrations_dir = "migrations"
+
+[env.production.vars]
+APP_ENV = "production"
+
+[env.production.ai]
+binding = "AI"
+
+[[env.production.ratelimits]]
+name = "COSTLY_RATE_LIMITER"
+namespace_id = "9201"
+
+[env.production.ratelimits.simple]
+limit = 10
+period = 60
+
+[[env.production.ratelimits]]
+name = "MUTATION_RATE_LIMITER"
+namespace_id = "9202"
+
+[env.production.ratelimits.simple]
+limit = 12
+period = 60
+
+[[env.production.ratelimits]]
+name = "AUTH_RATE_LIMITER"
+namespace_id = "9203"
+
+[env.production.ratelimits.simple]
+limit = 5
+period = 60
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "scout-production"
+database_id = "f7e8a188-bf7c-43e9-905a-fda7b0b6f1d7"
+migrations_dir = "migrations"

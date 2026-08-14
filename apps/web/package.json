@@ -1,0 +1,12 @@
+{
+  "name": "@scout/web",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@scout/core": "*"
+  },
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite"
+  }
+}
