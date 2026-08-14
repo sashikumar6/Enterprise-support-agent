@@ -6,8 +6,10 @@ data, require confirmation before actions, simulate checkout through Stripe test
 persist demo reservations.
 
 The Ticketmaster data-quality spike selected New York as the launch city. The Phase 2
-engineering foundation now provides a React shell, Hono Worker API, provider-neutral core,
-local D1 migrations, tests, and CI. Phase 3 is deterministic live discovery.
+engineering foundation provides a React shell, Hono Worker API, provider-neutral core, local
+D1 migrations, tests, and CI. Phase 3 adds validated live and fixture event discovery,
+deterministic ranking, explainable event cards, and honest provider-failure fallback. Phase 4
+is durable plans and commerce state modeling.
 
 Read [the complete project handoff](docs/PROJECT_HANDOFF.md) for product scope, architecture,
 provider limitations, zero-cost constraints, implementation phases, and definition of done.
@@ -53,6 +55,14 @@ npm run check
 npm run test:e2e
 ```
 
+Use the structured form to query live Ticketmaster-indexed events with the server-side key in
+`.env.local`, or select **Demo fixtures only** for a quota-free deterministic journey. Live
+provider failures automatically fall back with visible labeling. Price ranges are optional
+provider data and are never presented as final checkout prices.
+
 The complete Phase 2 checks and environment inventory are in
 [`docs/FOUNDATION_ACCEPTANCE.md`](docs/FOUNDATION_ACCEPTANCE.md). Architecture decisions live
 in [`docs/adr`](docs/adr).
+
+The Phase 3 contract, controls, and acceptance checks are documented in
+[`docs/DISCOVERY_ACCEPTANCE.md`](docs/DISCOVERY_ACCEPTANCE.md).

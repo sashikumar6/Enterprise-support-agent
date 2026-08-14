@@ -1,6 +1,6 @@
 # Scout project handoff
 
-Status: Phase 2 complete; Phase 3 deterministic live discovery is next  
+Status: Phase 3 complete; Phase 4 durable plans and commerce state is next
 Last updated: 2026-08-13  
 Working name: **Scout** (provisional; perform a naming/trademark check before public launch)
 
@@ -1185,7 +1185,7 @@ formatting, linting, typechecking, secret scanning, dry-run Worker builds, and G
 are in place. A clean `npm ci`, local migration, full quality check, live health/readiness
 requests, and both browser projects passed. No Cloudflare account or paid service was required.
 
-### Phase 3: deterministic live-discovery slice
+### Phase 3: deterministic live-discovery slice — complete 2026-08-13
 
 Outcome: a user can search and inspect real events without AI.
 
@@ -1198,6 +1198,18 @@ Outcome: a user can search and inspect real events without AI.
 - Fixture fallback
 
 Verification: real and fixture contract tests plus browser journey.
+
+Result: **COMPLETE**. The Worker validates bounded New York searches before provider use and
+keeps the Ticketmaster key server-only. The Ticketmaster adapter builds documented, bounded
+Discovery API requests and normalizes provider facts without filling missing values. Domain
+code filters cancelled/postponed/rescheduled, out-of-window, category-mismatched, and known
+over-budget events; applies stable explainable scoring and duplicate removal; and limits the
+response to 12 cards. Missing/rejected credentials, rate limits, invalid responses, and outages
+fall back to visibly labeled demo fixtures, while legitimate empty live responses stay empty.
+The responsive UI covers structured constraints, loading/error/empty states, live/fixture
+source and freshness labels, optional prices, score reasons, expandable details, and provider
+links. Unit/API/provider tests, a real bounded Ticketmaster request, and desktop/mobile browser
+journeys passed. The source contract and checks are recorded in `docs/DISCOVERY_ACCEPTANCE.md`.
 
 ### Phase 4: durable plan and commerce state machine
 
@@ -1504,21 +1516,30 @@ vertical slices need more state. Reason: this gives Scout deployable, tested bou
 premature domain tables or distributed services. The shell uses Scout-specific design tokens;
 no Beautiful UI source has been copied yet, so its third-party notice is not yet triggered.
 
+### 2026-08-13 — Complete deterministic discovery before persistence
+
+Decision: keep launch discovery constrained to New York, at most 30 days, one bounded
+Ticketmaster page, and 12 ranked results. Treat category, time, known provider price, status,
+and source completeness as deterministic evidence. Keep unknown price/status fields explicit;
+do not infer availability from party size. On provider configuration or availability failure,
+return clearly labeled fixtures with a machine-readable reason instead of making the core
+journey unusable. Reason: this proves the provider seam and honest recommendation behavior
+before Phase 4 introduces users, saved plans, or transaction state.
+
 ## 29. Immediate next action for a new Codex session
 
-Phase 2 is complete. Do not add AI orchestration, commerce, authentication, or broad product UI
-yet. Begin Phase 3 with the smallest deterministic live-discovery vertical slice.
+Phase 3 is complete. Do not add Stripe, AI orchestration, voice, or operations surfaces yet.
+Begin Phase 4 with durable plan and commerce-state modeling behind the existing discovery UI.
 
-1. Read this handoff completely and inspect the existing workspace without reverting the pivot,
-   data spike, or foundation files.
-2. Define and test the normalized Ticketmaster adapter contract using the existing sanitized
-   fixtures before issuing new live requests.
-3. Add strict search-constraint validation for the selected New York launch experience and
-   bounded Ticketmaster request construction behind `EventProvider`.
-4. Add deterministic hard filters, score components, stable tie-breaking, and truthful unknown
-   price/status/image handling.
-5. Implement the minimum structured search form and normalized event cards/details with source,
-   freshness, live/fixture mode, loading, empty, error, and rate-limit states.
-6. Verify fixture and live provider contracts plus one browser journey. Reuse the existing local
-   key without exposing it; a Cloudflare account is not required until remote bindings or the
-   first preview deployment are needed.
+1. Read this handoff completely and inspect the current domain/API/UI contracts without
+   changing the provider-backed discovery behavior.
+2. Define users/guest sessions, saved-plan drafts, event snapshots, checkout, payment,
+   reservation, transition, and audit records with the minimum D1 migrations required by the
+   Phase 4 journeys.
+3. Write state-machine tests first for valid transitions, invalid transitions, replay-safe
+   behavior, ownership, and concurrent-looking version conflicts.
+4. Add guest session ownership and repository contracts, keeping D1 outside the domain model.
+5. Let a user select a normalized event into a durable draft and inspect it in My Plans. Store
+   the observed event snapshot rather than silently refreshing historical decision facts.
+6. Verify local migrations, persistence integration, transition behavior, and a browser journey.
+   Do not create Stripe checkout or imply any reservation is a real Ticketmaster booking yet.

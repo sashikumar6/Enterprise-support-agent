@@ -1,2 +1,6 @@
+export * from "./discovery-service";
 export * from "./events";
 export * from "./fixture-event-provider";
+export * from "./provider-error";
+export * from "./ranking";
+export * from "./search-validation";
